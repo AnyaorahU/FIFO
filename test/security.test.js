@@ -129,6 +129,34 @@ test('an old login page submitted while already logged in goes straight to the d
   assert.equal(res.headers.get('location'), '/dashboard');
 });
 
+test('login from an expired page works first time from this site, but never from another site', async () => {
+  const setup = client();
+  await register(setup, 'firsttry@test.local');
+  const host = new URL(base).host;
+  // Same site, stale token (session expired / lost): logs in and goes to the dashboard
+  const c = client();
+  const ok = await c.request('/login', { method: 'POST', headers: { origin: `http://${host}` }, form: { _csrf: 'f'.repeat(48), email: 'firsttry@test.local', password: 'Password123' } });
+  assert.equal(ok.status, 302);
+  assert.equal(ok.headers.get('location'), '/dashboard');
+  assert.equal((await c.request('/dashboard')).status, 200);
+  // Another site, stale/forged token: rejected, not logged in
+  const evil = client();
+  const bad = await evil.request('/login', { method: 'POST', headers: { origin: 'https://evil.example' }, form: { _csrf: 'f'.repeat(48), email: 'firsttry@test.local', password: 'Password123' } });
+  assert.equal(bad.status, 303);
+  assert.equal((await evil.request('/dashboard')).status, 302);
+  // Other forms still require a valid token even from this site
+  const prof = await c.request('/dashboard/profile', { method: 'POST', headers: { origin: `http://${host}` }, form: { _csrf: 'f'.repeat(48), name: 'Changed Name' } });
+  assert.equal(prof.status, 303);
+  assert.equal((await dbm.col.users.findOne({ email: 'firsttry@test.local' })).name, 'Test firsttry@test.local');
+});
+
+test('saved jobs page lists jobs by their MongoDB ids', async () => {
+  const job = await dbm.col.jobs.findOne({ title: 'Test Job' });
+  const res = await client().request(`/jobs/saved?ids=${job._id},123,not-an-id`);
+  assert.equal(res.status, 200);
+  assert.ok(res.text_.includes(`data-save="${job._id}"`), 'saved job card should be listed');
+});
+
 test('candidates are isolated from each other', async () => {
   const alice = client(); const bob = client();
   await register(alice, 'alice@test.local');

@@ -38,6 +38,15 @@ function csrfExpired(req, res) {
   res.redirect(303, back);
 }
 
+const isCredentialForm = req => req.method === 'POST' && (req.path === '/login' || req.path === '/register');
+
+// True only when the browser says the request came from a page on this exact host.
+function sameOrigin(req) {
+  const origin = req.get('origin');
+  if (!origin || origin === 'null') return false;
+  try { return new URL(origin).host === req.get('host'); } catch { return false; }
+}
+
 function csrf(req, res, next) {
   if (!req.session.csrf) req.session.csrf = crypto.randomBytes(24).toString('hex');
   res.locals.csrfToken = req.session.csrf;
@@ -46,7 +55,10 @@ function csrf(req, res, next) {
     const token = String((req.body && req.body._csrf) || req.query._csrf || req.get('x-csrf-token') || '');
     const expected = req.session.csrf;
     const ok = token.length === expected.length && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
-    if (!ok) return csrfExpired(req, res);
+    // Login/registration from a page whose session has since expired (e.g. left open for hours): accept it when the
+    // browser's Origin header proves the form was submitted from this site (an OWASP-recognised CSRF defence),
+    // so people get in on the first attempt. Cross-site submissions are still rejected.
+    if (!ok && !(isCredentialForm(req) && sameOrigin(req))) return csrfExpired(req, res);
   }
   next();
 }

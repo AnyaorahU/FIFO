@@ -86,13 +86,21 @@
   }
 
   // ---- Saved jobs (stored on this device) ----
+  // Job ids are 24-character MongoDB ids (strings). Anything else (e.g. old numeric ids) is dropped.
   var KEY = 'savedJobs';
-  function readSaved() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch (e) { return []; } }
+  var isJobId = function (v) { return typeof v === 'string' && /^[a-f0-9]{24}$/.test(v); };
+  function readSaved() {
+    try {
+      var list = JSON.parse(localStorage.getItem(KEY)) || [];
+      return Array.isArray(list) ? list.filter(isJobId) : [];
+    } catch (e) { return []; }
+  }
   function writeSaved(list) { try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) { /* storage unavailable */ } }
+  writeSaved(readSaved()); // clean up entries saved by the earlier version
   function paintSaved() {
     var saved = readSaved();
     $$('[data-save]').forEach(function (b) {
-      var on = saved.indexOf(Number(b.getAttribute('data-save'))) !== -1;
+      var on = saved.indexOf(b.getAttribute('data-save')) !== -1;
       b.setAttribute('aria-pressed', String(on));
       var label = $('span', b);
       if (label) label.textContent = on ? 'Saved' : 'Save job';
@@ -102,7 +110,8 @@
   }
   $$('[data-save]').forEach(function (b) {
     b.addEventListener('click', function () {
-      var id = Number(b.getAttribute('data-save'));
+      var id = b.getAttribute('data-save');
+      if (!isJobId(id)) return;
       var saved = readSaved();
       var i = saved.indexOf(id);
       if (i === -1) saved.unshift(id); else saved.splice(i, 1);
