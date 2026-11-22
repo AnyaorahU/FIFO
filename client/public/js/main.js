@@ -163,6 +163,22 @@
       if (b) { b.disabled = true; b.textContent = 'Uploading…'; }
     });
   });
+  // Stop double-taps from sending a form twice (a second login request would undo the first one).
+  $$('form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      if (e.defaultPrevented) return;
+      if (form.getAttribute('data-submitting')) { e.preventDefault(); return; }
+      form.setAttribute('data-submitting', '1');
+      $$('button[type=submit]', form).forEach(function (b) { b.disabled = true; });
+      setTimeout(function () {
+        form.removeAttribute('data-submitting');
+        $$('button[type=submit]', form).forEach(function (b) { b.disabled = false; });
+      }, 8000);
+    });
+  });
+  // Never reuse a page restored from the back/forward cache: its security token may be out of date.
+  window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
+
   var pre = $('select[data-preselect]');
   if (pre && !pre.value) {
     var s = new URLSearchParams(location.search).get('sector');

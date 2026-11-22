@@ -109,10 +109,24 @@ test('private areas require login and send protective headers', async () => {
   assert.equal(res.headers.get('x-frame-options'), 'DENY');
 });
 
-test('forms without a CSRF token are rejected', async () => {
+test('forms without a valid CSRF token are rejected (sent back to a fresh form, nothing happens)', async () => {
   const c = client();
   const res = await c.request('/login', { method: 'POST', form: { email: ADMIN.email, password: ADMIN.password } });
-  assert.equal(res.status, 403);
+  assert.equal(res.status, 303);
+  assert.equal(res.headers.get('location'), '/login');
+  assert.equal((await c.request('/admin')).headers.get('location'), '/login', 'must not be logged in');
+  const stale = await c.request('/login', { method: 'POST', form: { _csrf: 'a'.repeat(48), email: ADMIN.email, password: ADMIN.password } });
+  assert.equal(stale.status, 303);
+  assert.equal((await c.request('/admin')).headers.get('location'), '/login', 'must not be logged in with a forged token');
+});
+
+test('an old login page submitted while already logged in goes straight to the dashboard', async () => {
+  const c = client();
+  const oldToken = await c.csrf('/login');
+  await register(c, 'returning@test.local'); // logging in rotates the session, so oldToken is now stale
+  const res = await c.request('/login', { method: 'POST', form: { _csrf: oldToken, email: 'returning@test.local', password: 'Password123' } });
+  assert.equal(res.status, 303);
+  assert.equal(res.headers.get('location'), '/dashboard');
 });
 
 test('candidates are isolated from each other', async () => {

@@ -19,6 +19,25 @@ async function loadUser(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// A form loaded before the last login/logout (old tab, Back button, restored page, double-tap) carries an old
+// token. Instead of a dead-end error, send the person somewhere sensible with a fresh form.
+function csrfExpired(req, res) {
+  // Already logged in and submitting an old login/register page: go straight to their home page.
+  if (req.user && ['/login', '/register'].includes(req.path)) {
+    return res.redirect(303, req.user.role === 'admin' ? '/admin' : '/dashboard');
+  }
+  const refererPath = fallback => {
+    try { return new URL(req.get('referer') || fallback, 'http://local').pathname || fallback; } catch { return fallback; }
+  };
+  let back;
+  if (['/login', '/register', '/contact', '/companies/enquiry'].includes(req.path)) back = req.path;
+  else if (req.originalUrl.startsWith('/dashboard')) back = '/dashboard';
+  else if (req.originalUrl.startsWith('/admin')) { const ref = refererPath('/admin'); back = ref.startsWith('/admin') ? ref : '/admin'; }
+  else back = refererPath('/');
+  req.flash('info', 'That page had expired, so we refreshed it. Please try again.');
+  res.redirect(303, back);
+}
+
 function csrf(req, res, next) {
   if (!req.session.csrf) req.session.csrf = crypto.randomBytes(24).toString('hex');
   res.locals.csrfToken = req.session.csrf;
@@ -27,9 +46,7 @@ function csrf(req, res, next) {
     const token = String((req.body && req.body._csrf) || req.query._csrf || req.get('x-csrf-token') || '');
     const expected = req.session.csrf;
     const ok = token.length === expected.length && crypto.timingSafeEqual(Buffer.from(token), Buffer.from(expected));
-    if (!ok) {
-      return res.status(403).render('error', { title: 'Session expired', message: 'Your form session expired. Please go back, refresh the page and try again.' });
-    }
+    if (!ok) return csrfExpired(req, res);
   }
   next();
 }

@@ -56,6 +56,8 @@ function buildApp() {
   const staticOpts = { maxAge: config.isProd ? '7d' : 0 };
   app.use(express.static(path.join(CLIENT_DIR, 'public'), staticOpts));
   app.use('/admin/assets', express.static(path.join(ADMIN_DIR, 'public'), staticOpts));
+  // Pages contain per-session security tokens, so browsers must not keep stale copies (Back button, restored tabs).
+  app.use((req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
   app.use(express.urlencoded({ extended: false, limit: '200kb', parameterLimit: 500 }));
   app.use(sanitizeInput);
   app.use(noIndex);
