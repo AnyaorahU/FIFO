@@ -11,7 +11,7 @@
       <ul class="utility">
         <% menus.utility.forEach(function (l) { %><li><a href="<%= l.href %>"><%= l.label %></a></li><% }) %>
         <% if (user) { %>
-          <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin' : 'My account' %></a></li>
+          <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin panel' : 'My profile' %></a></li>
           <li><form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="linklike">Log out</button></form></li>
         <% } else { %>
           <li><a href="/login">Log in</a></li>
@@ -74,18 +74,12 @@
     <ul class="mobile-utility">
       <% menus.utility.forEach(function (l) { %><li><a href="<%= l.href %>"><%= l.label %></a></li><% }) %>
       <% if (user) { %>
-        <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin' : 'My dashboard' %></a></li>
+        <li><form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="linklike">Log out</button></form></li>
+        <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin panel' : 'My profile' %></a></li>
       <% } else { %>
         <li><a href="/login">Log in</a></li><li><a href="/register">Create account</a></li>
       <% } %>
     </ul>
-    <% if (user) { %>
-      <form method="post" action="/logout" class="mobile-logout">
-        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-        <span class="mobile-user"><%- icon('user') %> <%= user.name %></span>
-        <button type="submit" class="btn btn-red btn-block"><%- icon('logout') %> Log out</button>
-      </form>
-    <% } %>
   </div>
 </header>
 <main id="main">
