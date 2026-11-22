@@ -2,7 +2,8 @@
 //   npm run migrate
 // 1. Jobs, candidate profiles, job alerts and branches get a country (existing records = Australia).
 // 2. Job pay is re-read so weekly/daily rates filter correctly.
-// 3. The sectors renamed in the admin to "Entry-level positions" and "Operators" get matching URL slugs,
+// 3. Wording that promised phone calls with a consultant is replaced (exact original sentences only).
+// 4. The sectors renamed in the admin to "Entry-level positions" and "Operators" get matching URL slugs,
 //    photos and roles (only where the old default photo/roles are still in place, so custom edits are kept).
 const { connect, client, col } = require('../db');
 const { parsePay } = require('../lib/pay');
@@ -50,6 +51,44 @@ async function socials() {
   const dropped = [s.socialFacebook && `Facebook (${s.socialFacebook})`, s.socialYoutube && `YouTube (${s.socialYoutube})`].filter(Boolean);
   await col.settings.updateOne({ _id: 'site' }, { $unset: { socialFacebook: '', socialYoutube: '' } });
   console.log(`  socials: Facebook/YouTube fields removed${dropped.length ? ` (were ${dropped.join(', ')}); add TikTok/Telegram links in Admin > Content > Site settings` : ''}`);
+}
+
+// Wording that promised phone calls with a consultant or the team. Only exact original sentences are replaced,
+// so anything an admin has rewritten is left alone.
+const WORDING = [
+  ['A consultant calls to talk about your experience, tickets and preferred rosters.', 'Our team reviews your experience, tickets and preferred rosters.'],
+  ['your consultant is always a phone call away.', 'our support team is always available by email or through your dashboard.'],
+  ['Conversation: a consultant learns about your experience and goals.', 'Review: our team assesses your experience, tickets and goals.'],
+  ["Your consultant will check in during the first few days. Tell them if anything isn't what you expected.", "We'll check in by email during the first few days. Let us know through your dashboard if anything isn't what you expected."],
+  ['I applied online and my consultant called me the next day. She sorted', 'I applied online and the team reviewed my profile the next day. They sorted'],
+  ['A consultant will call you back within one business day.', 'Send us your requirements and we will reply by email within one business day.'],
+];
+const LABELS = [['Talk to a specialist', 'Send your requirements'], ['Talk to us', 'Make an enquiry']];
+
+const reword = value => {
+  if (typeof value === 'string') return WORDING.reduce((s, [from, to]) => s.split(from).join(to), value);
+  if (Array.isArray(value)) return value.map(reword);
+  return value;
+};
+
+async function wording() {
+  let changed = 0;
+  const targets = [['pages', ['body', 'intro']], ['news', ['body', 'excerpt']], ['testimonials', ['quote']], ['settings', ['ctaText', 'ctaTitle']]];
+  for (const [name, fields] of targets) {
+    for (const doc of await col[name].find({}, { projection: Object.fromEntries(fields.concat('ctaLabel').map(f => [f, 1])) }).toArray()) {
+      const set = {};
+      for (const f of fields) {
+        const next = reword(doc[f]);
+        if (JSON.stringify(next) !== JSON.stringify(doc[f])) set[f] = next;
+      }
+      if (name === 'pages') {
+        const label = LABELS.find(([from]) => doc.ctaLabel === from);
+        if (label) set.ctaLabel = label[1];
+      }
+      if (Object.keys(set).length) { await col[name].updateOne({ _id: doc._id }, { $set: set }); changed++; }
+    }
+  }
+  console.log(`  wording: phone-call phrases replaced in ${changed} item${changed === 1 ? '' : 's'}`);
 }
 
 async function pay() {
@@ -116,6 +155,7 @@ async function sectors() {
   await countries();
   await pay();
   await socials();
+  await wording();
   await sectors();
   console.log('Done. Changes appear on the site within 30 seconds.');
 })().catch(e => { console.error('Migration failed:', e.message); process.exitCode = 1; }).finally(() => client.close());

@@ -100,7 +100,7 @@ router.post('/:id/apply', requireCandidate, ah(async (req, res, next) => {
   );
   if (r.upsertedCount) {
     await logActivity(req.user._id, 'job_apply', `${job.title} (${job._id})`, req.ip);
-    req.flash('success', `You've applied for ${job.title}. A consultant will be in touch.`);
+    req.flash('success', `You've applied for ${job.title}. You can follow its status in your dashboard.`);
   }
   res.redirect(`/jobs/${job._id}`);
 }));

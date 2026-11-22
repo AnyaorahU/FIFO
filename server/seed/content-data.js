@@ -121,7 +121,7 @@ const pages = [
     ], cta: { label: 'Send us your CV', href: '/register' } },
   { path: '/candidates/first-temporary-job', title: 'Your first FIFO job', banner: 'sector-mining', intro: 'Fly-in fly-out work means great pay, blocks of time off and real career progression. Here is how to get started.',
     sections: [
-      { h: 'How it works', list: ['Create your account and upload your CV.', 'A consultant calls to talk about your experience, tickets and preferred rosters.', 'We check your work rights, licences and references.', 'You complete your pre-employment medical, drug and alcohol test and any site inductions.', 'We confirm flights and accommodation, and you fly out for your first swing.'] },
+      { h: 'How it works', list: ['Create your account and upload your CV.', 'Our team reviews your experience, tickets and preferred rosters.', 'We check your work rights, licences and references.', 'You complete your pre-employment medical, drug and alcohol test and any site inductions.', 'We confirm flights and accommodation, and you fly out for your first swing.'] },
       { h: 'Common rosters', list: ['2 weeks on, 1 week off (2:1)', '8 days on, 6 days off (8:6)', '14 days on, 14 days off (14:14)', 'Shutdown work: short, intense blocks'] },
       { h: 'What to have ready', list: ['An up-to-date CV', 'Passport or other proof of your right to work', 'Licences and tickets (e.g. HR/MC, forklift, White Card, working at heights)', 'Two work references', 'A Working with Children Check or police check if the role requires it'] },
       { h: 'Life on site', p: ['Most sites provide flights from a capital or regional airport, camp accommodation and meals. Shifts are long, typically 12 hours, so look after your fatigue, stay hydrated and speak up about safety. Your consultant stays in touch for the whole assignment.'] },
@@ -134,11 +134,11 @@ const pages = [
   { path: '/candidates/safety', title: 'Your partners in safety', banner: 'promo-safety', intro: 'Everyone should go home safe at the end of every shift.',
     sections: [
       { h: 'Before you start', p: ['Every placement includes a site-specific induction and a check that you have the right PPE and training for the role.'] },
-      { h: 'While you work', p: ['Our safety team audits client sites, and your consultant is always a phone call away. If something feels unsafe, stop and tell us. You will never be penalised for raising a safety concern.'] },
+      { h: 'While you work', p: ['Our safety team audits client sites, and our support team is always available by email or through your dashboard. If something feels unsafe, stop and tell us. You will never be penalised for raising a safety concern.'] },
     ] },
   { path: '/candidates/recruitment-process', title: 'Our recruitment process', banner: 'banner-office', intro: 'Clear steps, regular updates and no surprises.',
     sections: [
-      { h: 'Step by step', list: ['Application: apply for a job or submit your CV.', 'Conversation: a consultant learns about your experience and goals.', 'Screening: right-to-work check, licence validation and references.', 'Matching: we present you to suitable employers.', 'Onboarding: contracts, induction and safety briefing.', 'Support: regular check-ins and prompt weekly pay.'] },
+      { h: 'Step by step', list: ['Application: apply for a job or submit your CV.', 'Review: our team assesses your experience, tickets and goals.', 'Screening: right-to-work check, licence validation and references.', 'Matching: we present you to suitable employers.', 'Onboarding: contracts, induction and safety briefing.', 'Support: regular check-ins and prompt weekly pay.'] },
     ] },
   { path: '/candidates/international', title: 'International candidates', banner: 'international', intro: 'Moving to Australia, or already here on a visa? Here is what you need to know.',
     sections: [
@@ -178,7 +178,7 @@ const pages = [
   { path: '/companies/specialist', title: 'Specialist recruitment', banner: 'promo-specialist', audience: 'companies', intro: 'Senior, technical and hard-to-fill roles, handled by specialists.',
     sections: [
       { h: 'Where we specialise', list: ['Engineering and technical', 'Operations and supply chain management', 'Health, safety and environment', 'Finance, HR and business support leadership'] },
-    ], cta: { label: 'Talk to a specialist', href: '/companies/enquiry' } },
+    ], cta: { label: 'Send your requirements', href: '/companies/enquiry' } },
   { path: '/companies/international', title: 'International recruitment', banner: 'banner-port', audience: 'companies', intro: 'One partner, many countries, clear outcomes.',
     sections: [
       { h: 'Hiring beyond Australia', p: ['When local talent is scarce, we source skilled workers from our international network for trades, manufacturing, logistics and engineering roles.'] },
@@ -192,7 +192,7 @@ const pages = [
   { path: '/companies/payroll', title: 'Payroll services', banner: 'banner-office', audience: 'companies', intro: 'Accurate, on-time pay and full compliance.',
     sections: [
       { h: 'We take care of', list: ['Award interpretation and penalty rates', 'Superannuation and tax obligations', 'Single Touch Payroll reporting', 'Payslips and employee queries'] },
-    ], cta: { label: 'Talk to us', href: '/companies/enquiry' } },
+    ], cta: { label: 'Make an enquiry', href: '/companies/enquiry' } },
   { path: '/companies/safety', title: 'Safety consultancy', banner: 'promo-safety', audience: 'companies', intro: 'Practical safety systems that protect your people.',
     sections: [
       { h: 'Services', list: ['Site safety audits and risk assessments', 'Induction design and delivery', 'On-site coaching for supervisors', 'Incident investigation support'] },
@@ -200,7 +200,7 @@ const pages = [
   { path: '/companies/diversity', title: 'Diversity & inclusion', banner: 'service-team', audience: 'companies', intro: 'Diverse teams perform better. We help you build them.',
     sections: [
       { h: 'How we help', list: ['Inclusive job ads and recruitment processes', 'Pathways for First Nations, mature-age and disabled candidates', 'Unconscious bias training for hiring managers'] },
-    ], cta: { label: 'Talk to us', href: '/companies/enquiry' } },
+    ], cta: { label: 'Make an enquiry', href: '/companies/enquiry' } },
   { path: '/companies/hr-solutions', title: '360° HR solutions', banner: 'banner-office', audience: 'companies', intro: 'Outsourced HR support, from first hire to ongoing compliance.',
     sections: [
       { h: 'How it works', list: ['Enquiry: tell us about your business and challenges.', 'Discovery: we get to know your operation.', 'Embedded support: onsite or remote, as you need.', 'Ongoing HR: contracts, onboarding, policy reviews and compliance checks.'] },
@@ -259,7 +259,7 @@ const news = [
     body: ['Labour hire gives you access to screened, inducted workers without the cost and time of permanent recruitment.', 'It works best when your recruitment partner understands your site, your safety requirements and your roster patterns.'] },
   { slug: 'first-week-on-site', title: 'Your first week on a new site: what to expect', date: '2026-10-15', tag: 'Candidates', image: 'news-5',
     excerpt: 'From induction to your first pay, here is how your first week usually goes.',
-    body: ['Day one usually starts with a site induction covering safety rules, emergency procedures and PPE.', 'Your consultant will check in during the first few days. Tell them if anything isn\'t what you expected.', 'Pay runs weekly, so make sure your bank, tax and super details are up to date in your dashboard.'] },
+    body: ['Day one usually starts with a site induction covering safety rules, emergency procedures and PPE.', 'We\'ll check in by email during the first few days. Let us know through your dashboard if anything isn\'t what you expected.', 'Pay runs weekly, so make sure your bank, tax and super details are up to date in your dashboard.'] },
   { slug: 'international-talent-skills-gap', title: 'How international talent is closing the skills gap', date: '2026-10-03', tag: 'Companies', image: 'news-6',
     excerpt: 'Employers in trades and manufacturing are looking overseas. Here is what that involves.',
     body: ['Where local candidates are scarce, many employers now recruit skilled workers from overseas.', 'Success depends on planning: realistic timelines, a registered migration adviser, and onboarding that helps new arrivals settle in.'] },
@@ -267,7 +267,7 @@ const news = [
 
 const testimonials = [
   { name: 'George B.', org: 'Haul truck operator, 2:1 FIFO roster', photo: 'person-1',
-    quote: 'I applied online and my consultant called me the next day. She sorted my medical and site induction and had me on my first swing within two weeks. I would recommend them to anyone wanting to start FIFO work.' },
+    quote: 'I applied online and the team reviewed my profile the next day. They sorted my medical and site induction and had me on my first swing within two weeks. I would recommend them to anyone wanting to start FIFO work.' },
   { name: 'Hannah M.', org: 'Camp chef, Pilbara', photo: 'person-2',
     quote: 'They took the time to understand the roster and the kind of camp I wanted. Flights, accommodation and pay were all clear from day one.' },
   { name: 'Luca R.', org: 'Project manager, civil contractor', photo: 'person-3',

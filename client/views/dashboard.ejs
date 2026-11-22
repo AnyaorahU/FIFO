@@ -26,7 +26,7 @@
   </ol>
 
   <% if (app.status === 'approved') { %>
-    <div class="notice notice-success"><%- icon('check') %><div><strong>You're approved.</strong> A consultant will contact you about suitable roles in <%= sectorName(app.job_sector) %>. You can also <a href="/jobs">apply for jobs</a> directly.</div></div>
+    <div class="notice notice-success"><%- icon('check') %><div><strong>You're approved.</strong> We'll match you with suitable roles in <%= sectorName(app.job_sector) %>; updates appear here and by email. You can also <a href="/jobs">apply for jobs</a> directly.</div></div>
   <% } else if (app.status === 'rejected') { %>
     <div class="notice notice-error"><%- icon('file') %><div><strong>Your profile wasn't successful this time.</strong> You can update your documents and resubmit at any time.</div></div>
   <% } else if (locked) { %>

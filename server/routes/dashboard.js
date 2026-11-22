@@ -130,7 +130,7 @@ router.post('/submit', ah(async (req, res) => {
     const now = new Date();
     await col.applications.updateOne({ user_id: req.user._id }, { $set: { status: 'submitted', submitted_at: now, updated_at: now } });
     await logActivity(req.user._id, 'submit_application', null, req.ip);
-    req.flash('success', 'Your profile has been submitted. Our team will review it and be in touch.');
+    req.flash('success', 'Your profile has been submitted. Our team will review it; you will see the result here and by email.');
   }
   res.redirect('/dashboard');
 }));

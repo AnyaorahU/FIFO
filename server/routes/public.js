@@ -64,7 +64,7 @@ router.post('/contact', formLimiter, ah(async (req, res) => {
     return res.status(400).render('contact', { title: 'Contact us', form });
   }
   await col.messages.insertOne({ kind: 'contact', ...form, is_read: false, created_at: new Date() });
-  req.flash('success', "Thanks, your message has been sent. We'll be in touch shortly.");
+  req.flash('success', "Thanks, your message has been sent. We'll reply by email shortly.");
   res.redirect('/contact');
 }));
 
@@ -94,7 +94,7 @@ router.post('/companies/enquiry', formLimiter, ah(async (req, res) => {
   }
   const { type, ...rest } = form;
   await col.messages.insertOne({ kind: type, audience: 'employer', ...rest, body: rest.body || '(no message)', is_read: false, created_at: new Date() });
-  req.flash('success', 'Thank you. A consultant will contact you within one business day.');
+  req.flash('success', 'Thank you. We will reply by email within one business day.');
   res.redirect('/companies/enquiry');
 }));
 

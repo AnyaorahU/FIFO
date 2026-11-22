@@ -51,7 +51,7 @@ function contentDocs() {
     servicesHeading: 'Our services',
     companiesSectorsHeading: 'Our FIFO areas of expertise',
     ctaTitle: 'Tell us what you need',
-    ctaText: 'A consultant will call you back within one business day.',
+    ctaText: 'Send us your requirements and we will reply by email within one business day.',
     internationalTitle: 'Connecting workers to able employers around the world',
     internationalText: 'From remote Australian mine sites and camps to projects overseas, we match skilled workers with employers who need them, and support both every step of the way.',
     internationalImage: '/img/international.jpg',
