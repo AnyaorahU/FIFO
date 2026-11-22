@@ -1,0 +1,60 @@
+<%- include('_top') %>
+<div class="kpis">
+  <div class="kpi"><span><%- icon('users') %> Candidates</span><strong><%= stats.candidates %></strong><small>+<%= stats.newThisWeek %> this week</small></div>
+  <div class="kpi"><span><%- icon('clock') %> Awaiting review</span><strong><%= stats.awaiting %></strong><small><a href="/admin/candidates?status=submitted">Review now →</a></small></div>
+  <div class="kpi"><span><%- icon('check') %> Approved</span><strong><%= stats.approved %></strong><small>ready to place</small></div>
+  <div class="kpi"><span><%- icon('briefcase') %> Open jobs</span><strong><%= stats.openJobs %></strong><small><%= stats.newJobApps %> new applications · <a href="/admin/jobs">Manage →</a></small></div>
+</div>
+
+<div class="admin-grid">
+  <section class="card">
+    <div class="card-head"><h2>Candidates by sector</h2></div>
+    <% var max = Math.max.apply(null, bySector.map(function (r) { return r.n; }).concat([1])); %>
+    <% if (!bySector.length) { %><p class="empty">No candidates yet.</p><% } %>
+    <ul class="bars">
+      <% bySector.forEach(function (r) { %>
+        <li><a href="/admin/candidates?sector=<%= r.job_sector || '' %>"><span class="bar-label"><%= r.job_sector ? sectorName(r.job_sector) : 'Not chosen' %></span><span class="bar"><i style="--w: <%= Math.round(r.n / max * 100) %>%"></i></span><span class="bar-n"><%= r.n %></span></a></li>
+      <% }) %>
+    </ul>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Pipeline</h2></div>
+    <ul class="pipeline">
+      <% statuses.forEach(function (s) { var row = byStatus.find(function (r) { return r.status === s; }); %>
+        <li><a href="/admin/candidates?status=<%= s %>"><span class="tag tag-<%= s %>"><%= statusLabel(s) %></span><strong><%= row ? row.n : 0 %></strong></a></li>
+      <% }) %>
+    </ul>
+  </section>
+</div>
+
+<div class="admin-grid">
+  <section class="card">
+    <div class="card-head"><h2>Recent submissions</h2><a href="/admin/candidates" class="link-arrow small">All candidates <%- icon('arrow') %></a></div>
+    <% if (!recentSubmissions.length) { %><p class="empty">No submissions yet.</p><% } else { %>
+    <table class="table">
+      <thead><tr><th>Candidate</th><th>Sector</th><th>Status</th><th>Submitted</th></tr></thead>
+      <tbody>
+        <% recentSubmissions.forEach(function (r) { %>
+          <tr><td><a href="/admin/candidates/<%= r.id %>"><strong><%= r.name %></strong></a><br><small class="muted"><%= r.email %></small></td><td><%= sectorName(r.job_sector) %></td><td><span class="tag tag-<%= r.status %>"><%= statusLabel(r.status) %></span></td><td><%= fmtDate(r.submitted_at) %></td></tr>
+        <% }) %>
+      </tbody>
+    </table>
+    <% } %>
+  </section>
+  <div>
+  <section class="card">
+    <div class="card-head"><h2>Latest job applications</h2><a href="/admin/jobs" class="link-arrow small">Jobs <%- icon('arrow') %></a></div>
+    <% if (!recentJobApps.length) { %><p class="empty">No job applications yet.</p><% } %>
+    <ul class="applicant-list">
+      <% recentJobApps.forEach(function (a) { %>
+        <li><div class="applicant-top"><div><a href="/admin/candidates/<%= a.user_id %>"><strong><%= a.name %></strong></a> → <a href="/admin/jobs/<%= a.job_id %>"><%= a.title %></a></div><span class="tag tag-app-<%= a.status %>"><%= appStatusLabel(a.status) %></span></div><small class="muted"><%= fmtDateTime(a.created_at) %></small></li>
+      <% }) %>
+    </ul>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Latest activity</h2><a href="/admin/activity" class="link-arrow small">Full log <%- icon('arrow') %></a></div>
+    <%- include('_activity', { rows: activity, showUser: true }) %>
+  </section>
+  </div>
+</div>
+<%- include('_bottom') %>

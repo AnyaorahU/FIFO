@@ -1,0 +1,30 @@
+{
+  "name": "fifoconnect",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FIFOconnect: FIFO and remote-site recruitment website with a candidate portal and admin console (Express, EJS, MongoDB).",
+  "license": "UNLICENSED",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch-path=server --watch-path=admin --watch-path=client server/index.js",
+    "seed": "node server/scripts/seed.js",
+    "seed:force": "node server/scripts/seed.js --force",
+    "create-admin": "node server/scripts/create-admin.js",
+    "migrate": "node server/scripts/migrate.js",
+    "test": "node --test --test-concurrency=1 \"test/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "connect-mongo": "^5.1.0",
+    "ejs": "^7.0.2",
+    "express": "^4.22.3",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "mongodb": "^6.22.0",
+    "multer": "^2.5.0"
+  }
+}

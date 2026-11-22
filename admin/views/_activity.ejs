@@ -1,0 +1,16 @@
+<%
+var labels = { register: 'Registered', login: 'Logged in', logout: 'Logged out', profile_update: 'Updated profile', upload: 'Uploaded', delete_document: 'Deleted document', submit_application: 'Submitted application', status_change: 'Status changed', account_enabled: 'Account enabled', account_disabled: 'Account disabled', admin_download: 'Downloaded document', admin_export: 'Exported CSV', admin_delete_candidate: 'Deleted candidate', job_apply: 'Applied for job', job_app_status: 'Job application updated', admin_job_create: 'Published job', admin_job_update: 'Updated job', admin_job_delete: 'Deleted job' };
+%>
+<% if (!rows.length) { %><p class="empty">No activity yet.</p><% } %>
+<ul class="feed">
+  <% rows.forEach(function (a) { %>
+    <li>
+      <span class="feed-dot act-<%= a.action %>"></span>
+      <div>
+        <% if (showUser) { %><% if (a.user_id && a.role !== 'admin') { %><a href="/admin/candidates/<%= a.user_id %>"><strong><%= a.name || 'Deleted user' %></strong></a><% } else { %><strong><%= a.name || 'Deleted user' %></strong><% } %> · <% } %>
+        <%= labels[a.action] || a.action %><% if (a.detail) { %> <span class="muted">— <%= a.detail %></span><% } %>
+        <small><%= fmtDateTime(a.created_at) %><% if (a.ip) { %> · <%= a.ip %><% } %></small>
+      </div>
+    </li>
+  <% }) %>
+</ul>

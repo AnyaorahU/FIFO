@@ -1,0 +1,16 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'Log in', intro: 'Access your candidate portal: profile, documents and applications.', image: null }) %>
+<section class="auth-wrap">
+  <div class="card auth-card">
+    <span class="bar"></span>
+    <h2>Welcome back</h2>
+    <form method="post" action="/login" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label>Email<input type="email" name="email" required autocomplete="email" value="<%= email %>" autofocus></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn btn-red btn-block" type="submit">Log in</button>
+    </form>
+    <p class="muted center">New here? <a href="/register">Create an account</a></p>
+  </div>
+</section>
+<%- include('partials/footer') %>

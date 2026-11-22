@@ -1,0 +1,12 @@
+<%# Inner-page banner. Locals: heading, intro (optional), image (optional), crumbs [{label, href}] %>
+<section class="banner <%= typeof image !== 'undefined' && image ? 'has-image' : '' %>">
+  <% if (typeof image !== 'undefined' && image) { %><img class="banner-img" src="<%= image %>" alt=""><% } %>
+  <div class="container banner-inner">
+    <% if (typeof crumbs !== 'undefined' && crumbs) { %>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><% crumbs.forEach(function (c) { %> <span>/</span> <% if (c.href) { %><a href="<%= c.href %>"><%= c.label %></a><% } else { %><span aria-current="page"><%= c.label %></span><% } %><% }) %></nav>
+    <% } %>
+    <h1><%= heading %></h1>
+    <% if (typeof intro !== 'undefined' && intro) { %><p class="banner-intro"><%= intro %></p><% } %>
+  </div>
+</section>
+<%- include('flash') %>

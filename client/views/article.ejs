@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: article.title, intro: article.tag + ' · ' + fmtDate(article.date + ' 00:00:00'), image: article.image, crumbs: [{ label: 'News', href: '/news' }, { label: article.title }] }) %>
+<section class="page-body">
+  <div class="container-narrow page-grid">
+    <article class="prose">
+      <p class="lead-p"><%= article.excerpt %></p>
+      <% article.body.forEach(function (p) { %><p><%= p %></p><% }) %>
+      <a class="u-link" href="/news">← All news</a>
+    </article>
+    <aside class="side">
+      <div class="side-card"><h3>More articles</h3><ul class="plain-list"><% news.filter(function (a) { return a.slug !== article.slug; }).slice(0, 4).forEach(function (a) { %><li><a href="/news/<%= a.slug %>"><%= a.title %></a></li><% }) %></ul></div>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

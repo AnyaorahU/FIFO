@@ -1,0 +1,20 @@
+<%- include('_top') %>
+<div class="kpis">
+  <% byCountry.slice(0, 4).forEach(function (s) { %><div class="kpi"><span><%- icon('globe') %> <%= s.country %></span><strong><%= s.n %></strong><small>subscribers</small></div><% }) %>
+</div>
+<section class="card flush">
+  <% if (!rows.length) { %><p class="empty pad">No job alert subscribers yet. Visitors sign up with the Job Alerts button on the site.</p><% } else { %>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Subscribed</th><th></th></tr></thead>
+    <tbody>
+      <% rows.forEach(function (r) { %>
+        <tr><td><%= r.name %></td><td><a href="mailto:<%= r.email %>"><%= r.email %></a></td><td><%= r.country || r.state %></td><td><%= fmtDate(r.created_at) %></td>
+          <td><form method="post" action="/admin/alerts/<%= r.id %>/delete" data-confirm="Remove this subscriber?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="icon-btn" type="submit" aria-label="Remove"><%- icon('trash') %></button></form></td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+  </div>
+  <% } %>
+</section>
+<%- include('_bottom') %>

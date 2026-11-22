@@ -1,0 +1,27 @@
+<%- include('_top') %>
+<% var kinds = { contact: 'Contact', enquiry: 'Business enquiry', 'health-check': 'Health check request' }; %>
+<% if (!rows.length) { %><section class="card"><p class="empty">No messages yet.</p></section><% } %>
+<div class="msg-list">
+  <% rows.forEach(function (m) { %>
+    <article class="card msg <%= m.is_read ? 'read' : 'unread' %>">
+      <header>
+        <div><strong><%= m.name %></strong><%= m.organisation ? ' · ' + m.organisation : '' %> <span class="tag <%= m.kind === 'contact' ? 'tag-doc' : 'tag-submitted' %>"><%= kinds[m.kind] || m.kind %></span> <span class="tag tag-doc"><%= m.audience === 'employer' ? 'Employer' : 'Candidate' %></span><br>
+          <small class="muted"><a href="mailto:<%= m.email %>"><%= m.email %></a><%= m.phone ? ' · ' + m.phone : '' %> · <%= fmtDateTime(m.created_at) %></small></div>
+        <form method="post" action="/admin/messages/<%= m.id %>/read">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-outline btn-sm" type="submit"><%= m.is_read ? 'Mark unread' : 'Mark read' %></button>
+        </form>
+      </header>
+      <% if (m.kind !== 'contact') { %>
+        <dl class="details compact">
+          <div><dt>Need</dt><dd><%= m.need || '—' %></dd></div>
+          <div><dt>Sector</dt><dd><%= m.sector ? sectorName(m.sector) : '—' %></dd></div>
+          <div><dt>Location</dt><dd><%= m.location || '—' %></dd></div>
+          <div><dt>Heard via</dt><dd><%= m.source || '—' %></dd></div>
+        </dl>
+      <% } %>
+      <p class="pre"><%= m.body %></p>
+    </article>
+  <% }) %>
+</div>
+<%- include('_bottom') %>

@@ -1,0 +1,85 @@
+<%- include('partials/header') %>
+<% var lines = function (t) { return String(t || '').split(/\r?\n/).filter(Boolean); }; %>
+<section class="hero">
+  <% if (site.companiesHeroImage) { %><img class="hero-img" src="<%= site.companiesHeroImage %>" alt=""><% } %>
+  <div class="container hero-inner">
+    <h1><% lines(site.companiesHeroTitle).forEach(function (l, i) { %><% if (i) { %> <br><% } %><%= l %><% }) %></h1>
+    <% if (site.companiesHeroText) { %><p class="hero-sub"><%= site.companiesHeroText %></p><% } %>
+    <div class="hero-ctas">
+      <a href="/companies/enquiry" class="btn btn-red"><%- icon('arrow') %> Request staff</a>
+      <a href="/companies/enquiry?type=health-check" class="btn btn-outline-white">Free workforce health check</a>
+    </div>
+  </div>
+</section>
+<%- include('partials/flash') %>
+
+<% if (promos.companies.length) { %>
+<section class="promos">
+  <div class="rail" data-rail>
+    <div class="rail-track">
+      <% promos.companies.forEach(function (p) { %>
+        <a class="promo <%= p.variant || '' %>" href="<%= p.href %>">
+          <% if (p.variant === 'image-top') { %><img src="<%= p.image %>" alt="" loading="lazy"><% } %>
+          <div class="promo-text"><span class="bar"></span><h2><%= p.title %></h2><span class="u-link">Learn more</span></div>
+          <% if (p.variant !== 'image-top') { %><img src="<%= p.image %>" alt="" loading="lazy"><% } %>
+        </a>
+      <% }) %>
+    </div>
+    <button class="rail-btn prev" type="button" data-rail-prev aria-label="Previous"><%- icon('chevron-left') %></button>
+    <button class="rail-btn next" type="button" data-rail-next aria-label="Next"><%- icon('chevron-right') %></button>
+  </div>
+</section>
+<% } %>
+
+<section class="services editable">
+  <%- include('partials/admin-edit', { links: [['Edit services', '/admin/content/services']] }) %>
+  <div class="container-narrow">
+    <h2 class="section-h"><%= site.servicesHeading || 'Our services' %></h2>
+    <div class="service-cols">
+      <% [['hire', 'Hire talent'], ['outsourcing', 'Outsourcing']].forEach(function (g) { if (!services[g[0]].length) return; %>
+        <div>
+          <h3 class="col-h"><%= g[1] %></h3>
+          <% services[g[0]].forEach(function (s) { %>
+            <a class="service-row" href="<%= s.href %>"><div><strong><%= s.title %></strong><span><%= s.summary %></span></div><%- icon('arrow') %></a>
+          <% }) %>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="sectors-band editable">
+  <%- include('partials/admin-edit', { links: [['Manage sectors', '/admin/content/sectors']] }) %>
+  <div class="sectors-layout">
+    <div class="sectors-intro">
+      <h2><%= site.companiesSectorsHeading || 'Our areas of expertise' %></h2>
+      <a href="/sectors" class="btn btn-white"><%- icon('arrow') %> <%= site.sectorsButton || 'All our sectors' %></a>
+    </div>
+    <div class="rail" data-rail>
+      <div class="rail-track">
+        <% sectors.forEach(function (s) { %>
+          <a class="sector-card" href="/sectors/<%= s.slug %>" style="--c: <%= s.color %>; --t: <%= s.text %>">
+            <div class="sector-card-text"><span class="bar white"></span><h3><%= s.name %></h3><p><%= s.blurb %></p><span class="u-link"><%= site.sectorsLinkLabel || 'Learn more' %></span></div>
+            <img src="<%= s.image %>" alt="" loading="lazy">
+          </a>
+        <% }) %>
+      </div>
+      <button class="rail-btn next" type="button" data-rail-next aria-label="Next sectors"><%- icon('chevron-right') %></button>
+      <button class="rail-btn prev" type="button" data-rail-prev aria-label="Previous sectors"><%- icon('chevron-left') %></button>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="container-narrow">
+    <div class="cta-card">
+      <div>
+        <span class="bar"></span>
+        <h2><%= site.ctaTitle || 'Tell us what you need' %></h2>
+        <% if (site.ctaText) { %><p><%= site.ctaText %></p><% } %>
+      </div>
+      <a href="/companies/enquiry" class="btn btn-red"><%- icon('arrow') %> Business enquiry</a>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

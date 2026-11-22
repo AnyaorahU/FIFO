@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'Our sectors', intro: 'Specialist consultants for every industry we recruit in.', image: '/img/banner-port.jpg', crumbs: [{ label: 'Sectors' }] }) %>
+<section class="sectors-band flat">
+  <div class="container-narrow sector-grid">
+    <% sectors.forEach(function (s) { %>
+      <a class="sector-card" href="/sectors/<%= s.slug %>" style="--c: <%= s.color %>; --t: <%= s.text %>">
+        <div class="sector-card-text"><span class="bar white"></span><h3><%= s.name %></h3><p><%= s.blurb %></p><span class="u-link">Learn more</span></div>
+        <img src="<%= s.image %>" alt="" loading="lazy">
+      </a>
+    <% }) %>
+  </div>
+</section>
+<%- include('partials/footer') %>

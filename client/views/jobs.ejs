@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+<%
+  var money = function (n) { return '$' + Math.round(n / 1000) + 'k'; };
+  var summaryOf = function (selected, all, label) {
+    if (!selected.length) return label;
+    var first = all(selected[0]);
+    return selected.length > 1 ? first + ' +' + (selected.length - 1) : first;
+  };
+  var multis = [
+    { name: 'sector', label: 'Industry', placeholder: 'Select industries', options: sectors.map(function (s) { return [s.slug, s.name]; }), counts: counts.sector },
+    { name: 'country', label: 'Country', placeholder: 'Select countries', options: COUNTRIES.filter(function (c) { return counts.country[c]; }).map(function (c) { return [c, c]; }), counts: counts.country },
+    { name: 'type', label: 'Job type', placeholder: 'Select job types', options: CONTRACT_TYPES.map(function (t) { return [t, t]; }), counts: counts.type },
+  ];
+%>
+<section class="banner search-banner plain">
+  <div class="container banner-inner">
+    <h1>Job search</h1>
+    <form class="search-bar" id="job-search" action="/jobs" method="get" role="search">
+      <input type="search" name="q" value="<%= f.q %>" placeholder="Profession, work type, city…" aria-label="Search jobs">
+      <button class="btn btn-blue" type="submit"><%- icon('search') %> Search</button>
+    </form>
+  </div>
+</section>
+<%- include('partials/flash') %>
+
+<section class="job-search">
+  <div class="container job-search-grid">
+    <aside class="criteria">
+      <details class="criteria-box" open data-criteria>
+        <summary class="criteria-head">
+          <span class="bar white"></span>
+          <h2>Your criteria<% if (activeFilters) { %> <small>(<%= activeFilters %>)</small><% } %></h2>
+          <span class="criteria-toggle"><%- icon('chevron') %></span>
+        </summary>
+        <a class="reset" href="<%= f.q ? '/jobs?q=' + encodeURIComponent(f.q) : '/jobs' %>"><%- icon('refresh') %> Reset filters</a>
+
+        <% multis.forEach(function (m) { %>
+          <div class="field">
+            <span class="field-label"><%= m.label %></span>
+            <details class="ms" data-ms>
+              <summary class="<%= f[m.name].length ? 'has-value' : '' %>">
+                <span><%= summaryOf(f[m.name], function (v) { return (m.options.find(function (o) { return o[0] === v; }) || [v, v])[1]; }, m.placeholder) %></span>
+                <%- icon('chevron') %>
+              </summary>
+              <div class="ms-panel">
+                <% m.options.forEach(function (o) { %>
+                  <label><input type="checkbox" form="job-search" name="<%= m.name %>" value="<%= o[0] %>" <%= f[m.name].includes(o[0]) ? 'checked' : '' %>> <span><%= o[1] %></span> <em><%= m.counts[o[0]] || 0 %></em></label>
+                <% }) %>
+              </div>
+            </details>
+          </div>
+        <% }) %>
+
+        <div class="field">
+          <label class="field-label" for="listed">Date listed</label>
+          <select id="listed" name="listed" form="job-search" data-autosubmit>
+            <% Object.keys(LISTED).sort(function (a, b) { return (a === '' ? -1 : Number(a)) - (b === '' ? -1 : Number(b)); }).forEach(function (k) { %><option value="<%= k %>" <%= f.listed === k ? 'selected' : '' %>><%= LISTED[k] %></option><% }) %>
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="min">Min salary</label>
+            <select id="min" name="min" form="job-search" data-autosubmit>
+              <option value="">Any</option>
+              <% SALARIES.forEach(function (s) { %><option value="<%= s %>" <%= f.min === s ? 'selected' : '' %>><%= money(s) %></option><% }) %>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="max">Max salary</label>
+            <select id="max" name="max" form="job-search" data-autosubmit>
+              <option value="">Any</option>
+              <% SALARIES.forEach(function (s) { %><option value="<%= s %>" <%= f.max === s ? 'selected' : '' %>><%= money(s) %></option><% }) %>
+            </select>
+          </div>
+        </div>
+        <p class="salary-note">Salary filters compare the annual equivalent of hourly, daily and weekly rates.</p>
+        <button type="submit" form="job-search" class="btn btn-white btn-block">Show results</button>
+      </details>
+    </aside>
+
+    <div class="results">
+      <p class="results-count"><%= total %> job offer<%= total === 1 ? '' : 's' %><% if (f.q) { %> for “<%= f.q %>”<% } %></p>
+      <% if (!jobs.length) { %>
+        <div class="empty-card">
+          <h3>No jobs match your search</h3>
+          <p>Try fewer words or <a href="/jobs">reset the filters</a>. You can also <a href="#job-alerts" data-open-alerts>sign up for job alerts</a> or <a href="/register">submit your CV</a> and we'll contact you when something suitable comes up.</p>
+        </div>
+      <% } %>
+      <div class="job-grid one">
+        <% jobs.forEach(function (job) { %><%- include('partials/job-card', { job: job }) %><% }) %>
+      </div>
+      <% if (pages > 1) { %>
+        <nav class="pagination" aria-label="Pages">
+          <% if (page > 1) { %><a class="page-btn" href="<%= urlWith({ page: page - 1 }) %>" aria-label="Previous page"><%- icon('chevron-left') %></a><% } else { %><span class="page-btn disabled"><%- icon('chevron-left') %></span><% } %>
+          <% for (var p = 1; p <= pages; p++) { if (p === 1 || p === pages || Math.abs(p - page) <= 1) { %>
+            <% if (p === page) { %><span class="page-btn current" aria-current="page"><%= p %></span><% } else { %><a class="page-btn" href="<%= urlWith({ page: p }) %>"><%= p %></a><% } %>
+          <% } else if (Math.abs(p - page) === 2) { %><span class="page-gap">…</span><% } } %>
+          <% if (page < pages) { %><a class="page-btn" href="<%= urlWith({ page: page + 1 }) %>" aria-label="Next page"><%- icon('chevron-right') %></a><% } else { %><span class="page-btn disabled"><%- icon('chevron-right') %></span><% } %>
+        </nav>
+      <% } else if (jobs.length) { %>
+        <nav class="pagination" aria-label="Pages"><span class="page-btn disabled"><%- icon('chevron-left') %></span><span class="page-btn current" aria-current="page">1</span><span class="page-btn disabled"><%- icon('chevron-right') %></span></nav>
+      <% } %>
+    </div>
+  </div>
+</section>
+<%- include('partials/footer') %>

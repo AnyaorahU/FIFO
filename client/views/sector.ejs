@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: sector.name, intro: sector.blurb, image: sector.image, crumbs: [{ label: 'Sectors', href: '/sectors' }, { label: sector.name }] }) %>
+<section class="page-body">
+  <div class="container-narrow page-grid">
+    <article class="prose">
+      <section><span class="bar"></span><h2>Roles we recruit</h2>
+        <ul class="square-list dark cols"><% sector.roles.forEach(function (r) { %><li><%= r %></li><% }) %></ul>
+      </section>
+      <section><span class="bar"></span><h2>Current jobs</h2>
+        <% if (!jobs.length) { %><p>No current openings in this sector. <a href="#job-alerts" data-open-alerts>Sign up for job alerts</a> to hear about new roles first.</p><% } %>
+        <div class="job-grid one"><% jobs.forEach(function (job) { %><%- include('partials/job-card', { job: job }) %><% }) %></div>
+        <a class="btn btn-blue" href="/jobs?sector=<%= sector.slug %>"><%- icon('arrow') %> All <%= sector.name %> jobs</a>
+      </section>
+    </article>
+    <aside class="side">
+      <div class="side-card red"><h3>Looking for work in <%= sector.name %>?</h3><p>Upload your CV once and apply for jobs in one click.</p><a class="btn btn-white" href="/register?sector=<%= sector.slug %>">Submit your CV</a></div>
+      <div class="side-card"><h3>Hiring?</h3><p>Our <%= sector.name %> consultants can help.</p><a class="u-link" href="/companies/enquiry">Request staff</a></div>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

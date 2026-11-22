@@ -1,0 +1,32 @@
+<%- include('_top') %>
+<div class="admin-grid wide-left">
+  <section class="card flush">
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Admin</th><th>Last login</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <% rows.forEach(function (u) { %>
+          <tr class="<%= u.active === false ? 'disabled' : '' %>">
+            <td><strong><%= u.name %></strong><%= u.id === user.id ? ' (you)' : '' %><br><small class="muted"><%= u.email %></small></td>
+            <td><%= fmtDateTime(u.last_login_at) %></td>
+            <td><span class="tag <%= u.active === false ? 'tag-rejected' : 'tag-approved' %>"><%= u.active === false ? 'Disabled' : 'Active' %></span><% if (u.locked_until && new Date(u.locked_until) > new Date()) { %> <span class="tag tag-submitted">Locked</span><% } %></td>
+            <td><% if (u.id !== user.id) { %><form method="post" action="/admin/users/<%= u.id %>/toggle" class="inline-status" data-confirm="<%= u.active === false ? 'Enable this admin?' : 'Disable this admin? They will be signed out.' %>"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><input type="password" name="confirm_password" required autocomplete="current-password" placeholder="Your password" aria-label="Your password"><button class="btn btn-outline btn-sm" type="submit"><%= u.active === false ? 'Enable' : 'Disable' %></button></form><% } %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Add an admin</h2></div>
+    <form method="post" action="/admin/users" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label>Name<input name="name" required maxlength="120" value="<%= form.name || '' %>"></label>
+      <label>Email<input type="email" name="email" required maxlength="200" value="<%= form.email || '' %>" autocomplete="off"></label>
+      <label>Temporary password<input type="password" name="password" required minlength="12" autocomplete="new-password"><span class="hint">At least 12 characters with letters and numbers. Ask them to change it after first login.</span></label>
+      <label class="confirm-pw">Your own password<input type="password" name="confirm_password" required autocomplete="current-password" placeholder="Confirm with your password"></label>
+      <button class="btn btn-primary" type="submit">Create admin</button>
+    </form>
+  </section>
+</div>
+<%- include('_bottom') %>

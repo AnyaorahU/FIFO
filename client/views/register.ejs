@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'Submit your CV', intro: 'Create your free account. You can then upload your CV, passport and licences and apply for jobs in one click.', image: null }) %>
+<section class="auth-wrap">
+  <div class="card auth-card wide">
+    <span class="bar"></span>
+    <h2>Create your account</h2>
+    <form method="post" action="/register" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <div class="row2">
+        <label>Full name<input name="name" required maxlength="120" autocomplete="name" value="<%= form.name || '' %>"></label>
+        <label>Phone<input name="phone" type="tel" maxlength="40" autocomplete="tel" value="<%= form.phone || '' %>"></label>
+      </div>
+      <label>Email<input type="email" name="email" required maxlength="200" autocomplete="email" value="<%= form.email || '' %>"></label>
+      <div class="row2">
+        <label>Preferred job sector
+          <select name="job_sector" data-preselect>
+            <option value="">Choose later</option>
+            <% sectors.forEach(function (s) { %><option value="<%= s.slug %>" <%= form.job_sector === s.slug ? 'selected' : '' %>><%= s.name %></option><% }) %>
+          </select>
+        </label>
+        <label>Country you want to work in
+          <%- include('partials/country-select', { name: 'country', selected: form.country, placeholder: 'Select a country…' }) %>
+        </label>
+      </div>
+      <div class="row2">
+        <label>Password<input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
+        <label>Confirm password<input type="password" name="confirm" required minlength="8" autocomplete="new-password"></label>
+      </div>
+      <label class="check"><input type="checkbox" name="terms" value="1" required> I agree to the <a href="/privacy" target="_blank">privacy policy</a> and confirm my details are accurate.</label>
+      <button class="btn btn-red btn-block" type="submit">Create account</button>
+    </form>
+    <p class="muted center">Already registered? <a href="/login">Log in</a></p>
+  </div>
+</section>
+<%- include('partials/footer') %>

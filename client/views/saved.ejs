@@ -1,0 +1,11 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'Saved jobs', intro: 'Jobs you have saved on this device.', image: null, crumbs: [{ label: 'Saved jobs' }] }) %>
+<section class="opportunities" data-saved-page="<%= hasIds ? 'loaded' : 'load' %>">
+  <div class="container-narrow">
+    <% if (!jobs.length) { %>
+      <div class="empty-card"><h3>No saved jobs yet</h3><p>Tap the heart on any job to save it here.</p><a class="btn btn-blue" href="/jobs"><%- icon('arrow') %> Browse jobs</a></div>
+    <% } %>
+    <div class="job-grid"><% jobs.forEach(function (job) { %><%- include('partials/job-card', { job: job }) %><% }) %></div>
+  </div>
+</section>
+<%- include('partials/footer') %>

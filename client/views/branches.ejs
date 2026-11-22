@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'Find a branch', intro: branches.length + (branches.length === 1 ? ' branch' : ' branches') + ' to support you.', image: null, crumbs: [{ label: 'Branches' }] }) %>
+<section class="teams">
+  <div class="container-narrow">
+    <div class="teams-card">
+      <div class="map" data-map data-tiles="<%= mapTiles.url %>" data-attribution="<%= mapTiles.attribution %>" data-branches="<%= JSON.stringify(list.length ? list : branches) %>" aria-label="Map of branch locations"></div>
+      <div class="teams-info">
+        <form class="search-mini" action="/branches" method="get" role="search">
+          <input type="search" name="q" value="<%= q %>" placeholder="Country, region, city…" aria-label="Search branches">
+          <button class="btn btn-blue" type="submit" aria-label="Search"><%- icon('search') %></button>
+        </form>
+        <div class="state-tabs">
+          <a href="/branches" class="<%= !country ? 'on' : '' %>">All</a>
+          <% Array.from(new Set(branches.map(function (b) { return b.country; }))).forEach(function (c) { %><a href="/branches?country=<%= encodeURIComponent(c) %>" class="<%= country === c ? 'on' : '' %>"><%= c %></a><% }) %>
+        </div>
+        <% if (!list.length) { %><p class="empty">No branches match “<%= q %>”. <a href="/branches">Show all</a></p><% } %>
+        <ul class="branch-list">
+          <% list.forEach(function (b) { %>
+            <% var ph = b.phone || site.phone; %><li><span class="bar"></span><div><strong><%= b.city %></strong><span><%= place(b.address, b.state, b.country) %></span></div><% if (ph) { %><a href="tel:<%= ph.replace(/\s/g, '') %>"><%- icon('phone') %> <%= ph %></a><% } %></li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<%- include('partials/footer') %>

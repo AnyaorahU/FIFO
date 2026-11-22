@@ -1,0 +1,226 @@
+<%- include('partials/header') %>
+<% var lines = function (t) { return String(t || '').split(/\r?\n/).filter(Boolean); }; %>
+<section class="hero editable">
+  <%- include('partials/admin-edit', { links: [['Edit hero', '/admin/content/settings#hero']] }) %>
+  <% if (site.heroImage) { %><img class="hero-img" src="<%= site.heroImage %>" alt=""><% } %>
+  <div class="container hero-inner">
+    <h1><% lines(site.heroTitle).forEach(function (l, i) { %><%= i ? ' ' : '' %><% if (i) { %><br><% } %><%= l %><% }) %></h1>
+    <% if (site.heroText) { %><p class="hero-sub"><%= site.heroText %></p><% } %>
+    <form class="search-bar" action="/jobs" method="get" role="search">
+      <input type="search" name="q" placeholder="<%= site.searchPlaceholder || 'Profession, work type, city…' %>" aria-label="Search jobs">
+      <button class="btn btn-blue" type="submit"><%- icon('search') %> Search</button>
+    </form>
+  </div>
+</section>
+<%- include('partials/flash') %>
+
+<% if (promos.candidates.length) { %>
+<section class="promos editable">
+  <%- include('partials/admin-edit', { links: [['Edit promo cards', '/admin/content/promos']] }) %>
+  <div class="rail" data-rail>
+    <div class="rail-track">
+      <% promos.candidates.forEach(function (p) { %>
+        <a class="promo <%= p.variant || '' %>" href="<%= p.href %>">
+          <% if (p.variant === 'image-top') { %><img src="<%= p.image %>" alt="" loading="lazy"><% } %>
+          <div class="promo-text">
+            <span class="bar"></span>
+            <h2><%= p.title %></h2>
+            <span class="u-link">Learn more</span>
+          </div>
+          <% if (p.variant !== 'image-top') { %><img src="<%= p.image %>" alt="" loading="lazy"><% } %>
+        </a>
+      <% }) %>
+    </div>
+    <button class="rail-btn prev" type="button" data-rail-prev aria-label="Previous"><%- icon('chevron-left') %></button>
+    <button class="rail-btn next" type="button" data-rail-next aria-label="Next"><%- icon('chevron-right') %></button>
+  </div>
+</section>
+<% } %>
+
+<section class="opportunities editable" data-opportunities data-visible="<%= visible %>">
+  <%- include('partials/admin-edit', { links: [['Edit section', '/admin/content/settings#opportunities'], ['Manage jobs', '/admin/jobs']] }) %>
+  <div class="container-narrow">
+    <h2 class="section-h"><%= site.opportunitiesHeading || 'Discover our opportunities' %></h2>
+    <div class="chips-wrap">
+      <div class="chips" data-chips>
+        <button type="button" class="chip on" data-chip=""><%= site.opportunitiesChipAll || 'New' %></button>
+        <% chips.forEach(function (s) { %><button type="button" class="chip" data-chip="<%= s.slug %>"><%= s.name %></button><% }) %>
+      </div>
+      <button type="button" class="chip-arrow" data-chips-prev aria-label="Scroll categories left"><%- icon('chevron-left') %></button>
+      <button type="button" class="chip-arrow" data-chips-next aria-label="Scroll categories right"><%- icon('chevron-right') %></button>
+    </div>
+    <div class="job-grid" data-job-grid>
+      <% jobs.forEach(function (job, i) { %>
+        <div class="job-slot <%= i >= visible ? 'is-hidden' : '' %>" data-sector="<%= job.sector %>"><%- include('partials/job-card', { job: job }) %></div>
+      <% }) %>
+    </div>
+    <p class="empty center" data-no-jobs <%= jobs.length ? 'hidden' : '' %>><%= site.opportunitiesEmpty || 'No current jobs in this category.' %> <a href="#job-alerts" data-open-alerts>Get job alerts</a></p>
+    <div class="center"><a class="btn btn-blue" href="/jobs" data-all-jobs><%- icon('arrow') %> <%= site.opportunitiesButton || 'Discover all our offers' %></a></div>
+  </div>
+</section>
+
+<section class="sectors-band editable">
+  <%- include('partials/admin-edit', { links: [['Edit section', '/admin/content/settings#sectors'], ['Manage sectors', '/admin/content/sectors']] }) %>
+  <div class="sectors-layout">
+    <div class="sectors-intro">
+      <h2><%= site.sectorsHeading || 'Discover the sectors we are recruiting in' %></h2>
+      <a href="/sectors" class="btn btn-white"><%- icon('arrow') %> <%= site.sectorsButton || 'All our sectors' %></a>
+    </div>
+    <div class="rail" data-rail>
+      <div class="rail-track">
+        <% sectors.forEach(function (s) { %>
+          <a class="sector-card" href="/sectors/<%= s.slug %>" style="--c: <%= s.color %>; --t: <%= s.text %>">
+            <div class="sector-card-text">
+              <span class="bar white"></span>
+              <h3><%= s.name %></h3>
+              <p><%= s.blurb %></p>
+              <span class="u-link"><%= site.sectorsLinkLabel || 'Learn more' %></span>
+            </div>
+            <img src="<%= s.image %>" alt="" loading="lazy">
+          </a>
+        <% }) %>
+      </div>
+      <button class="rail-btn next" type="button" data-rail-next aria-label="Next sectors"><%- icon('chevron-right') %></button>
+      <button class="rail-btn prev" type="button" data-rail-prev aria-label="Previous sectors"><%- icon('chevron-left') %></button>
+    </div>
+  </div>
+</section>
+
+<% if (branches.length) { %>
+<section class="teams editable">
+  <%- include('partials/admin-edit', { links: [['Edit branches', '/admin/content/branches']] }) %>
+  <div class="container-narrow">
+    <h2 class="section-h"><%= site.teamsHeading || 'Our teams by your side' %></h2>
+    <div class="teams-card">
+      <div class="map" data-map data-tiles="<%= mapTiles.url %>" data-attribution="<%= mapTiles.attribution %>" data-branches="<%= JSON.stringify(branches) %>" aria-label="Map of branch locations"></div>
+      <div class="teams-info">
+        <span class="bar"></span>
+        <h3><a href="/branches"><%= branches.length %></a> branch<%= branches.length === 1 ? '' : 'es' %> to support you</h3>
+        <form class="search-mini" action="/branches" method="get" role="search">
+          <input type="search" name="q" placeholder="Country, region, city…" aria-label="Search branches">
+          <button class="btn btn-blue" type="submit" aria-label="Search branches"><%- icon('search') %></button>
+        </form>
+        <ul class="state-links">
+          <% Array.from(new Set(branches.map(function (b) { return b.country; }))).forEach(function (c) { %><li><a href="/branches?country=<%= encodeURIComponent(c) %>">Find a branch in <%= c %></a></li><% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<% if (news.length) { %>
+<section class="news-band editable">
+  <%- include('partials/admin-edit', { links: [['Edit news', '/admin/content/news']] }) %>
+  <h2 class="section-h light container-wide"><%= site.newsHeading || 'Employment news' %></h2>
+  <div class="rail" data-rail>
+    <div class="rail-track">
+      <% news.slice(0, 2).forEach(function (a) { %>
+        <a class="news-card <%= a.highlight ? 'red' : '' %>" href="/news/<%= a.slug %>">
+          <div class="news-text"><h3><%= a.title %></h3><p><%= a.excerpt %></p></div>
+          <img src="<%= a.image %>" alt="" loading="lazy">
+        </a>
+      <% }) %>
+      <% if (news.length > 2) { %>
+      <div class="news-card list">
+        <h3>Latest</h3>
+        <ul>
+          <% news.slice(2, 6).forEach(function (a) { %>
+            <li><a href="/news/<%= a.slug %>"><img src="<%= a.image %>" alt="" loading="lazy"><span><%= a.title %></span></a></li>
+          <% }) %>
+        </ul>
+      </div>
+      <% } %>
+      <% news.slice(2, 5).forEach(function (a) { %>
+        <a class="news-card" href="/news/<%= a.slug %>">
+          <div class="news-text"><h3><%= a.title %></h3><p><%= a.excerpt %></p></div>
+          <img src="<%= a.image %>" alt="" loading="lazy">
+        </a>
+      <% }) %>
+    </div>
+    <button class="rail-btn next" type="button" data-rail-next aria-label="Next articles"><%- icon('chevron-right') %></button>
+    <button class="rail-btn prev" type="button" data-rail-prev aria-label="Previous articles"><%- icon('chevron-left') %></button>
+  </div>
+</section>
+<% } %>
+
+<% if (testimonials.length) { %>
+<section class="testimonials editable">
+  <%- include('partials/admin-edit', { links: [['Edit testimonials', '/admin/content/testimonials']] }) %>
+  <div class="container-narrow">
+    <div class="testimonial-card" data-slider>
+      <% testimonials.forEach(function (t, i) { %>
+        <figure class="testimonial-slide <%= i === 0 ? 'on' : '' %>" data-slide>
+          <% if (t.photo) { %><img src="<%= t.photo %>" alt=""><% } else { %><div></div><% } %>
+          <div class="testimonial-body">
+            <span class="quote-box"><%- icon('quote') %></span>
+            <blockquote><%= t.quote %></blockquote>
+            <figcaption><strong><%= t.name %></strong><span><%= t.org %></span></figcaption>
+          </div>
+        </figure>
+      <% }) %>
+      <div class="pager"><button type="button" data-slide-prev aria-label="Previous testimonial"><%- icon('chevron-left') %></button><span data-slide-count>1/<%= testimonials.length %></span><button type="button" data-slide-next aria-label="Next testimonial"><%- icon('chevron-right') %></button></div>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<section class="duo editable">
+  <%- include('partials/admin-edit', { links: [['Edit mission', '/admin/content/missionSlides'], ['Edit portal card', '/admin/content/settings#home-other']] }) %>
+  <div class="container-narrow duo-grid">
+    <% if (missionSlides.length) { %>
+    <div class="mission-card" data-slider>
+      <h2><span class="highlight">Our Mission</span></h2>
+      <% missionSlides.forEach(function (m, i) { %>
+        <div class="mission-slide <%= i === 0 ? 'on' : '' %>" data-slide>
+          <p class="mission-title"><%= m.title %></p>
+          <p><%= m.text %></p>
+        </div>
+      <% }) %>
+      <div class="pager"><button type="button" data-slide-prev aria-label="Previous"><%- icon('chevron-left') %></button><span data-slide-count>1/<%= missionSlides.length %></span><button type="button" data-slide-next aria-label="Next"><%- icon('chevron-right') %></button></div>
+    </div>
+    <% } %>
+    <div class="portal-card">
+      <div class="portal-head">
+        <h2><%= site.portalTitle || 'Your candidate portal' %></h2>
+        <span class="portal-badge"><%- icon('user') %></span>
+      </div>
+      <ul class="square-list">
+        <% (site.portalPoints || []).forEach(function (pt) { %><li><%= pt %></li><% }) %>
+      </ul>
+      <div class="portal-actions">
+        <a href="<%= user ? '/dashboard' : '/register' %>" class="btn btn-white"><%- icon('arrow') %> <%= user ? 'Go to my account' : 'Create your account' %></a>
+        <% if (!user) { %><a href="/login" class="u-link light">Log in</a><% } %>
+      </div>
+      <div class="portal-mock" aria-hidden="true">
+        <div class="mock-screen">
+          <div class="mock-bar"></div>
+          <p>Hi, Alex</p>
+          <div class="mock-row ok"></div><div class="mock-row ok"></div><div class="mock-row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<% if (site.internationalTitle) { %>
+<section class="international editable">
+  <%- include('partials/admin-edit', { links: [['Edit section', '/admin/content/settings']] }) %>
+  <% if (site.internationalImage) { %><img class="international-img" src="<%= site.internationalImage %>" alt=""><% } %>
+  <div class="container-wide">
+    <div class="international-card">
+      <img class="logo-full" src="<%= site.logo || '/img/brand/logo-wordmark.png' %>" alt="<%= site.name %>">
+      <h2><%= site.internationalTitle %></h2>
+      <% if (site.internationalText) { %><p><%= site.internationalText %></p><% } %>
+      <ul class="country-list">
+        <% (site.countries || []).forEach(function (c) { %><li><%= c %></li><% }) %>
+      </ul>
+      <a href="/companies/international" class="u-link">International recruitment</a>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<%- include('partials/footer') %>

@@ -1,0 +1,6 @@
+<%# Edit shortcuts shown only to logged-in admins. Locals: links [[label, href], ...] %>
+<% if (user && user.role === 'admin') { %>
+  <div class="admin-edit" aria-label="Admin shortcuts">
+    <% links.forEach(function (l) { %><a href="<%= l[1] %>"><%- icon('gear') %> <%= l[0] %></a><% }) %>
+  </div>
+<% } %>

@@ -1,0 +1,32 @@
+<%- include('_top') %>
+<div class="filters card">
+  <div class="state-tabs">
+    <a href="/admin/jobs" class="<%= !status ? 'on' : '' %>">All</a>
+    <a href="/admin/jobs?status=open" class="<%= status === 'open' ? 'on' : '' %>">Open</a>
+    <a href="/admin/jobs?status=closed" class="<%= status === 'closed' ? 'on' : '' %>">Closed</a>
+  </div>
+  <a class="btn btn-primary" href="/admin/jobs/new" style="margin-left:auto">+ New job</a>
+</div>
+<section class="card flush">
+  <% if (!rows.length) { %><p class="empty pad">No jobs yet. <a href="/admin/jobs/new">Publish your first job</a>.</p><% } else { %>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><th>Job</th><th>Sector</th><th>Type</th><th>Applicants</th><th>Status</th><th>Published</th></tr></thead>
+    <tbody>
+      <% rows.forEach(function (j) { %>
+        <tr class="<%= j.status === 'closed' ? 'disabled' : '' %>">
+          <td><a href="/admin/jobs/<%= j.id %>"><strong><%= j.title %></strong></a><% if (j.featured) { %> <span class="tag tag-submitted">Featured</span><% } %><br><small class="muted"><%= place(j.location, j.state, j.country) %><%= j.pay ? ' · ' + j.pay : '' %></small></td>
+          <td><%= sectorName(j.sector) %></td>
+          <td><%= j.contract_type %></td>
+          <td><strong><%= j.applicants %></strong><% if (j.new_applicants) { %> <span class="tag tag-submitted"><%= j.new_applicants %> new</span><% } %></td>
+          <td><span class="tag <%= j.status === 'open' ? 'tag-approved' : 'tag-draft' %>"><%= j.status === 'open' ? 'Open' : 'Closed' %></span></td>
+          <td><%= fmtDate(j.published_at) %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted small pad"><%= rows.length %> job<%= rows.length === 1 ? '' : 's' %></p>
+  <% } %>
+</section>
+<%- include('_bottom') %>

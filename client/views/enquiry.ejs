@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: form.type === 'health-check' ? 'Free workforce health check' : 'Business enquiry', intro: form.type === 'health-check' ? 'A no-cost review of your workforce strengths, risks and opportunities.' : 'Tell us about your business and a consultant will contact you within one business day.', image: site.companiesHeroImage, crumbs: [{ label: 'Companies', href: '/companies' }, { label: 'Enquiry' }] }) %>
+<section class="page-body">
+  <div class="container-narrow page-grid">
+    <form method="post" action="/companies/enquiry" class="card form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <input type="hidden" name="type" value="<%= form.type %>">
+      <div class="row2">
+        <label>Full name<input name="name" required maxlength="120" autocomplete="name" value="<%= form.name || '' %>"></label>
+        <label>Organisation<input name="organisation" required maxlength="160" autocomplete="organization" value="<%= form.organisation || '' %>"></label>
+      </div>
+      <div class="row2">
+        <label>Email<input type="email" name="email" required maxlength="200" autocomplete="email" value="<%= form.email || '' %>"></label>
+        <label>Phone<input type="tel" name="phone" maxlength="40" autocomplete="tel" value="<%= form.phone || '' %>"></label>
+      </div>
+      <div class="row2">
+        <label>Location<input name="location" maxlength="120" placeholder="Suburb, state" value="<%= form.location || '' %>"></label>
+        <label>Industry sector
+          <select name="sector"><option value="">Select…</option><% sectors.forEach(function (s) { %><option value="<%= s.slug %>" <%= form.sector === s.slug ? 'selected' : '' %>><%= s.name %></option><% }) %></select>
+        </label>
+      </div>
+      <fieldset class="seg">
+        <legend>What do you need?</legend>
+        <% ['Temporary', 'Permanent', 'Both', 'Outsourcing / HR'].forEach(function (n) { %><label><input type="radio" name="need" value="<%= n %>" required <%= form.need === n ? 'checked' : '' %>> <%= n %></label><% }) %>
+      </fieldset>
+      <label>How did you hear about us?<input name="source" maxlength="120" value="<%= form.source || '' %>"></label>
+      <label>Message<textarea name="body" rows="5" maxlength="5000" placeholder="Roles, numbers, start date, roster…"><%= form.body || '' %></textarea></label>
+      <button class="btn btn-red" type="submit">Send enquiry</button>
+    </form>
+    <aside class="side">
+      <div class="side-card"><h3>What happens next?</h3><ul class="square-list dark"><li>A consultant calls you to understand your needs</li><li>We agree a plan and screening criteria</li><li>We present suitable candidates, fast</li></ul></div>
+      <div class="side-card"><h3>Prefer to talk?</h3><p><a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a></p></div>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

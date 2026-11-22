@@ -1,0 +1,27 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: page.title, intro: page.intro, image: page.banner, crumbs: [{ label: page.title }] }) %>
+<section class="page-body">
+  <div class="container-narrow page-grid">
+    <article class="prose">
+      <% page.sections.forEach(function (s) { %>
+        <section>
+          <% if (s.h) { %><span class="bar"></span>
+          <h2><%= s.h %></h2><% } %>
+          <% (s.p || []).forEach(function (p) { %><p><%= p %></p><% }) %>
+          <% if (s.list) { %><ul class="square-list dark"><% s.list.forEach(function (li) { %><li><%= li %></li><% }) %></ul><% } %>
+        </section>
+      <% }) %>
+      <% if (page.ctaLabel && page.ctaHref) { %><a class="btn btn-blue" href="<%= page.ctaHref %>"><%- icon('arrow') %> <%= page.ctaLabel %></a><% } %>
+    </article>
+    <aside class="side">
+      <% if (audience === 'companies') { %>
+        <div class="side-card red"><h3>Need staff?</h3><p>Tell us about your business and a consultant will be in touch within one business day.</p><a class="btn btn-white" href="/companies/enquiry">Business enquiry</a></div>
+      <% } else { %>
+        <div class="side-card red"><h3>Looking for work?</h3><p>Create your account, upload your CV and apply for jobs in one click.</p><a class="btn btn-white" href="/register">Submit your CV</a></div>
+        <div class="side-card"><h3>Browse jobs</h3><p>New roles are added every day across Australia.</p><a class="u-link" href="/jobs">Search jobs</a></div>
+      <% } %>
+      <div class="side-card"><h3>Talk to us</h3><p><a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a><br><a href="mailto:<%= site.email %>"><%= site.email %></a></p><a class="u-link" href="/branches">Find a branch</a></div>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

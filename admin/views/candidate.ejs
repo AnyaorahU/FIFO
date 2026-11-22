@@ -1,0 +1,99 @@
+<%- include('_top') %>
+<% var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.ceil(n / 1024) + ' KB'; };
+   var kindLabel = { cv: 'CV / Résumé', passport: 'Passport / ID', certificate: 'Certificate' }; %>
+<p><a href="/admin/candidates" class="link-back">← All candidates</a></p>
+
+<div class="admin-grid wide-left">
+  <div>
+    <section class="card">
+      <div class="profile-head">
+        <span class="avatar"><%= c.name.split(' ').map(function (p) { return p[0]; }).slice(0, 2).join('').toUpperCase() %></span>
+        <div>
+          <h2><%= c.name %> <span class="tag tag-<%= c.status %>"><%= statusLabel(c.status) %></span><% if (!c.active) { %> <span class="tag tag-rejected">Disabled</span><% } %></h2>
+          <p class="muted"><a href="mailto:<%= c.email %>"><%= c.email %></a><%= c.phone ? ' · ' : '' %><% if (c.phone) { %><a href="tel:<%= c.phone %>"><%= c.phone %></a><% } %></p>
+        </div>
+      </div>
+      <dl class="details">
+        <div><dt>Job sector</dt><dd><%= sectorName(c.job_sector) %></dd></div>
+        <div><dt>Country / region</dt><dd><%= place(c.location, c.country || c.state) || '—' %></dd></div>
+        <div><dt>Right to work</dt><dd><%= c.work_rights ? constants.WORK_RIGHTS[c.work_rights] : '—' %><%= c.visa_type ? ' (' + c.visa_type + ')' : '' %></dd></div>
+        <div><dt>Availability</dt><dd><%= c.availability || '—' %></dd></div>
+        <div><dt>Registered</dt><dd><%= fmtDate(c.created_at) %></dd></div>
+        <div><dt>Last login</dt><dd><%= fmtDateTime(c.last_login_at) %></dd></div>
+        <div><dt>Submitted</dt><dd><%= fmtDateTime(c.submitted_at) %></dd></div>
+        <div><dt>Last update</dt><dd><%= fmtDateTime(c.updated_at) %></dd></div>
+      </dl>
+      <% if (c.licences && c.licences.length) { %><h3 class="mini">Licences &amp; tickets</h3><p><% c.licences.forEach(function (l) { %><span class="chip on"><%= l %></span> <% }) %></p><% } %>
+      <% if (c.summary) { %><h3 class="mini">About</h3><p class="pre"><%= c.summary %></p><% } %>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Documents</h2></div>
+      <% if (!docs.length) { %><p class="empty">No documents uploaded yet.</p><% } %>
+      <div class="file-list">
+        <% docs.forEach(function (d) { %>
+          <div class="file-row">
+            <span class="tag tag-doc"><%= kindLabel[d.kind] %></span>
+            <a href="/files/<%= d.id %>" class="file-name"><%- icon('download') %> <%= d.title ? d.title + ' — ' : '' %><%= d.original_name %></a>
+            <span class="hint"><%= kb(d.size) %> · <%= fmtDate(d.uploaded_at) %></span>
+          </div>
+        <% }) %>
+      </div>
+      <% var hasCv = docs.some(function (d) { return d.kind === 'cv'; }), hasPp = docs.some(function (d) { return d.kind === 'passport'; }); %>
+      <% if (!hasCv || !hasPp) { %><p class="hint">Missing: <%= [!hasCv && 'CV', !hasPp && 'Passport'].filter(Boolean).join(', ') %></p><% } %>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Job applications (<%= jobApps.length %>)</h2></div>
+      <% if (!jobApps.length) { %><p class="empty">No job applications.</p><% } %>
+      <ul class="applicant-list">
+        <% jobApps.forEach(function (a) { %>
+          <li>
+            <div class="applicant-top"><a href="/admin/jobs/<%= a.job_id %>"><strong><%= a.title %></strong></a><small class="muted"><%= fmtDateTime(a.created_at) %></small></div>
+            <% if (a.note) { %><p class="pre note"><%= a.note %></p><% } %>
+            <form method="post" action="/admin/job-applications/<%= a.id %>/status" class="inline-status">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <input type="hidden" name="back" value="/admin/candidates/<%= c.id %>">
+              <select name="status"><% Object.keys(APP_STATUS).forEach(function (k) { %><option value="<%= k %>" <%= a.status === k ? 'selected' : '' %>><%= APP_STATUS[k] %></option><% }) %></select>
+              <button class="btn btn-outline btn-sm" type="submit">Update</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Activity</h2></div>
+      <%- include('_activity', { rows: activity, showUser: false }) %>
+    </section>
+  </div>
+
+  <div>
+    <section class="card">
+      <div class="card-head"><h2>Review</h2></div>
+      <form method="post" action="/admin/candidates/<%= c.id %>/status" class="form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label>Application status
+          <select name="status">
+            <% statuses.forEach(function (s) { %><option value="<%= s %>" <%= c.status === s ? 'selected' : '' %>><%= statusLabel(s) %></option><% }) %>
+          </select>
+        </label>
+        <label>Internal notes <span class="hint">(not visible to candidate)</span><textarea name="admin_notes" rows="6" maxlength="5000"><%= c.admin_notes || '' %></textarea></label>
+        <button class="btn btn-primary btn-block" type="submit">Save review</button>
+      </form>
+    </section>
+    <section class="card">
+      <div class="card-head"><h2>Account</h2></div>
+      <form method="post" action="/admin/candidates/<%= c.id %>/toggle" data-confirm="<%= c.active ? 'Disable this account? The candidate will be signed out.' : 'Re-enable this account?' %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="btn btn-outline btn-block" type="submit"><%= c.active ? 'Disable account' : 'Enable account' %></button>
+      </form>
+      <form method="post" action="/admin/candidates/<%= c.id %>/delete" class="form danger-form" data-confirm="Permanently delete this candidate and all their documents? This cannot be undone.">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label class="confirm-pw">Your password<input type="password" name="confirm_password" required autocomplete="current-password" placeholder="Confirm with your password"></label>
+        <button class="btn btn-danger btn-block" type="submit"><%- icon('trash') %> Delete candidate</button>
+      </form>
+    </section>
+  </div>
+</div>
+<%- include('_bottom') %>

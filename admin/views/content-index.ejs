@@ -1,0 +1,11 @@
+<%- include('_top') %>
+<p class="muted">Everything shown on the public website is managed here. Changes appear on the site immediately.</p>
+<div class="content-grid">
+  <% Object.keys(types).forEach(function (name) { var t = types[name]; %>
+    <a class="card content-tile" href="/admin/content/<%= name %>">
+      <strong><%= t.label %></strong>
+      <span class="muted small"><%= t.single ? 'Settings' : counts[name] + ' item' + (counts[name] === 1 ? '' : 's') %></span>
+    </a>
+  <% }) %>
+</div>
+<%- include('_bottom') %>

@@ -1,0 +1,19 @@
+<%- include('_top') %>
+<div class="admin-grid">
+  <section class="card">
+    <div class="card-head"><h2>Change password</h2></div>
+    <form method="post" action="/admin/account/password" class="form">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <label>Current password<input type="password" name="current" required autocomplete="current-password"></label>
+      <label>New password<input type="password" name="password" required minlength="12" autocomplete="new-password"><span class="hint">At least 12 characters with letters and numbers.</span></label>
+      <label>Confirm new password<input type="password" name="confirm" required minlength="12" autocomplete="new-password"></label>
+      <button class="btn btn-primary" type="submit">Change password</button>
+    </form>
+  </section>
+  <section class="card">
+    <div class="card-head"><h2>Signed in as</h2></div>
+    <p><strong><%= user.name %></strong><br><span class="muted"><%= user.email %></span></p>
+    <p class="muted small">Changing your password signs out all your other sessions. Sessions also expire after a period of inactivity.</p>
+  </section>
+</div>
+<%- include('_bottom') %>

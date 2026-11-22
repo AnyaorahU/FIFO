@@ -1,0 +1,79 @@
+<%- include('partials/header') %>
+<% var brand = [['Our Mission', site.brandMission], ['Our Promise', site.brandPromise], ['Our USP', site.brandUsp]].filter(function (b) { return b[1]; }); %>
+<section class="banner has-image about-banner">
+  <% if (site.aboutBanner) { %><img class="banner-img" src="<%= site.aboutBanner %>" alt=""><% } %>
+  <div class="container banner-inner">
+    <h1>About <%= site.name %></h1>
+  </div>
+</section>
+<%- include('partials/flash') %>
+
+<section class="about-story">
+  <div class="container-narrow">
+    <h2 class="red-h">Our Story</h2>
+    <div class="story-text">
+      <% (site.aboutStory || []).forEach(function (p) { %><p><%= p %></p><% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="about-brand">
+  <div class="container-narrow">
+    <h2 class="red-h">Our Brand Message</h2>
+    <div class="accordion">
+      <% brand.forEach(function (b, i) { %>
+        <details class="acc-item" <%= i === 0 ? 'open' : '' %>>
+          <summary><span><%= b[0] %></span><span class="acc-btn"><%- icon('chevron') %></span></summary>
+          <p><%= b[1] %></p>
+        </details>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="about-values">
+  <div class="container-narrow">
+    <h2 class="section-h">Our Values</h2>
+    <div class="values-grid">
+      <% values.forEach(function (v) { %>
+        <article class="value-card">
+          <span class="value-tag"><%= v.tag %></span>
+          <p><strong><%= v.name %></strong><%= v.subtitle ? ' / ' + v.subtitle : '' %>. <%= v.text %></p>
+        </article>
+      <% }) %>
+    </div>
+    <a class="culture-link" href="/join-us">A behind-the-scenes look at our internal culture.</a>
+  </div>
+</section>
+
+<section class="about-message">
+  <% if (site.leadershipImage) { %><img class="banner-img" src="<%= site.leadershipImage %>" alt=""><% } %>
+  <div class="container-narrow about-message-inner">
+    <% (site.leadershipMessage || []).forEach(function (p) { %><p><%= p %></p><% }) %>
+    <% if (site.leadershipSignature) { %><p class="signature"><em><%= site.leadershipSignature %></em></p><% } %>
+  </div>
+</section>
+
+<section class="about-map">
+  <div class="map tall" data-map data-tiles="<%= mapTiles.url %>" data-attribution="<%= mapTiles.attribution %>" data-branches="<%= JSON.stringify(branches) %>" aria-label="Map of branch locations"></div>
+</section>
+
+<section class="about-cta-wrap">
+  <div class="container-narrow">
+    <div class="about-cta">
+      <div>
+        <span class="bar white square"></span>
+        <h2>Looking for a recruitment provider?</h2>
+        <p>We can help.</p>
+      </div>
+      <a href="/companies/enquiry" class="btn btn-white btn-lg"><%- icon('arrow') %> Contact us</a>
+    </div>
+    <div class="gallery">
+      <% (site.aboutGallery || []).forEach(function (img) { %><img src="<%= img %>" alt=""><% }) %>
+    </div>
+  </div>
+</section>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<%- include('partials/footer') %>

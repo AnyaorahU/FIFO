@@ -1,0 +1,34 @@
+<%- include('partials/head', { bodyClass: 'admin-page', stylesheet: '/admin/assets/admin.css' }) %>
+<div class="admin-shell">
+  <aside class="admin-side" data-nav>
+    <a href="/admin" class="logo">
+      <img class="admin-icon" src="/img/brand/icon-192.png" alt="" width="42" height="42">
+      <span class="logo-word"><strong>Admin</strong><small><%= site.name %></small></span>
+    </a>
+    <nav>
+      <a href="/admin" class="<%= path === '/admin' ? 'active' : '' %>"><%- icon('grid') %> Overview</a>
+      <a href="/admin/candidates" class="<%= path.startsWith('/admin/candidates') ? 'active' : '' %>"><%- icon('users') %> Candidates</a>
+      <a href="/admin/jobs" class="<%= path.startsWith('/admin/jobs') ? 'active' : '' %>"><%- icon('briefcase') %> Jobs</a>
+      <a href="/admin/alerts" class="<%= path.startsWith('/admin/alerts') ? 'active' : '' %>"><%- icon('clock') %> Job alerts</a>
+      <a href="/admin/messages" class="<%= path.startsWith('/admin/messages') ? 'active' : '' %>"><%- icon('mail') %> Enquiries <% if (unread) { %><span class="badge"><%= unread %></span><% } %></a>
+      <a href="/admin/content" class="<%= path.startsWith('/admin/content') ? 'active' : '' %>"><%- icon('file') %> Content</a>
+      <a href="/admin/users" class="<%= path.startsWith('/admin/users') ? 'active' : '' %>"><%- icon('shield') %> Admin users</a>
+      <a href="/admin/account" class="<%= path.startsWith('/admin/account') ? 'active' : '' %>"><%- icon('user') %> My account</a>
+      <a href="/admin/activity" class="<%= path.startsWith('/admin/activity') ? 'active' : '' %>"><%- icon('activity') %> Activity log</a>
+      <a href="/" target="_blank"><%- icon('arrow') %> View website</a>
+    </nav>
+    <div class="admin-me">
+      <span><%= user.name %><small><%= user.email %></small></span>
+      <form method="post" action="/logout">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="icon-btn light" type="submit" aria-label="Log out" title="Log out"><%- icon('logout') %></button>
+      </form>
+    </div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-top">
+      <button class="nav-toggle dark admin-toggle" aria-label="Open menu" aria-expanded="false" data-nav-toggle><%- icon('menu') %></button>
+      <h1><%= title %></h1>
+    </header>
+    <%- include('partials/flash') %>
+    <div class="admin-content">

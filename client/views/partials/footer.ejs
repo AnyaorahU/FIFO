@@ -1,0 +1,64 @@
+</main>
+<%
+  var socials = [['tiktok', site.socialTiktok], ['instagram', site.socialInstagram], ['linkedin', site.socialLinkedin], ['telegram', site.socialTelegram]].filter(function (s) { return s[1]; });
+%>
+<section class="footer-band">
+  <div class="container footer-band-inner">
+    <div>
+      <img class="footer-logo" src="<%= site.logo || '/img/brand/logo-wordmark.png' %>" alt="<%= site.name %>">
+      <% if (site.footerTagline) { %><p class="footer-tagline"><%= site.footerTagline %></p><% } %>
+      <ul>
+        <% menus.utility.forEach(function (l) { %><li><a href="<%= l.href %>"><%= l.label %></a></li><% }) %>
+      </ul>
+    </div>
+    <% if (socials.length) { %>
+    <div class="follow">
+      <p>Follow us</p>
+      <div class="socials">
+        <% socials.forEach(function (s) { %><a href="<%= s[1] %>" target="_blank" rel="noopener" aria-label="<%= s[0] %>"><%- icon(s[0]) %></a><% }) %>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</section>
+<footer class="site-footer">
+  <div class="container footer-cols">
+    <% menus.footer.forEach(function (colm) { var links = (colm.groups || []).reduce(function (a, g) { return a.concat(g.links); }, []); %>
+      <div>
+        <h3><%= colm.label %></h3>
+        <ul><% links.forEach(function (l) { %><li><a href="<%= l.href %>" <%- l.href === '#job-alerts' ? 'data-open-alerts' : '' %>><%= l.label %></a></li><% }) %></ul>
+      </div>
+    <% }) %>
+  </div>
+  <div class="container footer-legal">
+    <% if (site.acknowledgement) { %><p class="ack"><%= site.acknowledgement %></p><% } %>
+    <ul>
+      <li><a href="/privacy">Privacy policy</a></li>
+      <li><a href="/terms">Terms of use</a></li>
+      <% if (site.phone) { %><li><a href="tel:<%= site.phone.replace(/\s/g, '') %>"><%= site.phone %></a></li><% } %>
+      <li><span>&copy; <%= new Date().getFullYear() %> <%= site.name %></span></li>
+    </ul>
+  </div>
+</footer>
+
+<button type="button" class="alerts-fab" data-open-alerts>Job Alerts</button>
+<dialog class="alerts-dialog" id="job-alerts" aria-labelledby="alerts-title">
+  <form method="post" action="/job-alerts" class="form">
+    <button type="button" class="dialog-close" data-close-alerts aria-label="Close"><%- icon('close') %></button>
+    <span class="bar"></span>
+    <h2 id="alerts-title">Sign up for job alerts</h2>
+    <p class="muted">Get new FIFO jobs in your chosen country sent straight to your inbox.</p>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <input type="hidden" name="back" value="<%= path %>">
+    <label>Name<input name="name" required maxlength="120" autocomplete="name"></label>
+    <label>Email<input type="email" name="email" required maxlength="200" autocomplete="email"></label>
+    <label>Country
+      <%- include('partials/country-select', { name: 'country', selected: '', required: true, placeholder: 'Where do you want to work?' }) %>
+    </label>
+    <button class="btn btn-red btn-block" type="submit">Subscribe</button>
+  </form>
+</dialog>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

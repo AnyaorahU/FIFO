@@ -1,0 +1,9 @@
+<% if (flash && flash.length) { %>
+<div class="flash-wrap">
+  <div class="container">
+    <% flash.forEach(function (f) { %>
+      <div class="flash flash-<%= f.type %>" role="<%= f.type === 'error' ? 'alert' : 'status' %>"><%= f.text %></div>
+    <% }) %>
+  </div>
+</div>
+<% } %>

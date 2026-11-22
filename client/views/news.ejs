@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<%- include('partials/banner', { heading: 'News & advice', intro: 'Workforce insights for businesses and career advice for candidates.', image: '/img/news-4.jpg', crumbs: [{ label: 'News' }] }) %>
+<section class="news-band flat">
+  <div class="container-narrow news-grid">
+    <% news.forEach(function (a) { %>
+      <a class="news-card <%= a.highlight ? 'red' : '' %>" href="/news/<%= a.slug %>">
+        <div class="news-text"><span class="tag-line"><%= a.tag %> · <%= fmtDate(a.date + ' 00:00:00') %></span><h3><%= a.title %></h3><p><%= a.excerpt %></p></div>
+        <img src="<%= a.image %>" alt="" loading="lazy">
+      </a>
+    <% }) %>
+  </div>
+</section>
+<%- include('partials/footer') %>

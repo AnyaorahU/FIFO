@@ -1,0 +1,61 @@
+<%- include('partials/header') %>
+<section class="banner has-image">
+  <img class="banner-img" src="<%= (sectors.find(function (s) { return s.slug === job.sector; }) || {}).image || '/img/banner-office.jpg' %>" alt="">
+  <div class="container banner-inner">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span>/</span> <a href="/jobs">Job search</a> <span>/</span> <span aria-current="page"><%= job.title %></span></nav>
+    <h1><%= job.title %></h1>
+    <ul class="job-facts">
+      <li><%- icon('pin') %> <%= place(job.location, job.state, job.country) %></li>
+      <li><%- icon('briefcase') %> <%= job.contract_type %></li>
+      <% if (job.pay) { %><li><%- icon('award') %> <%= job.pay %></li><% } %>
+      <li><%- icon('clock') %> Published <%= fmtShort(job.published_at) %></li>
+    </ul>
+  </div>
+</section>
+<%- include('partials/flash') %>
+<section class="page-body">
+  <div class="container-narrow page-grid">
+    <article class="prose">
+      <% if (job.status === 'closed') { %><div class="notice notice-info"><%- icon('clock') %><div>This job is no longer accepting applications. <a href="/jobs?sector=<%= job.sector %>">See similar jobs</a></div></div><% } %>
+      <section><span class="bar"></span><h2>About the role</h2><p class="lead-p"><%= job.summary %></p>
+        <% job.description.split(/\n\s*\n/).forEach(function (para) { %><p><%= para %></p><% }) %>
+      </section>
+      <% if (job.requirements) { %>
+        <section><span class="bar"></span><h2>What you'll need</h2>
+          <ul class="square-list dark"><% job.requirements.split('\n').filter(Boolean).forEach(function (r) { %><li><%= r %></li><% }) %></ul>
+        </section>
+      <% } %>
+      <section><span class="bar"></span><h2>Sector</h2><p><a href="/sectors/<%= job.sector %>"><%= sectorName(job.sector) %></a></p></section>
+    </article>
+    <aside class="side">
+      <div class="side-card apply-card" id="apply">
+        <h3>Apply for this job</h3>
+        <% if (job.status !== 'open') { %>
+          <p>Applications are closed.</p>
+        <% } else if (!user) { %>
+          <p>Create a free account or log in to apply. Your CV and documents are saved for future applications.</p>
+          <a class="btn btn-red btn-block" href="/register">Create account</a>
+          <a class="btn btn-outline btn-block" href="/login">Log in</a>
+        <% } else if (user.role === 'admin') { %>
+          <p>You're logged in as an administrator. <a href="/admin/jobs/<%= job.id %>">Manage this job</a></p>
+        <% } else if (applied) { %>
+          <p class="applied"><%- icon('check') %> You applied on <%= fmtShort(applied.created_at) %>.</p>
+          <p class="muted small">Status: <strong><%= { new: 'Received', shortlisted: 'Shortlisted', placed: 'Successful', unsuccessful: 'Not progressed' }[applied.status] %></strong></p>
+          <a class="u-link" href="/dashboard#applications">View my applications</a>
+        <% } else { %>
+          <form method="post" action="/jobs/<%= job.id %>/apply" class="form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label>Message to the consultant <span class="hint">(optional)</span><textarea name="note" rows="4" maxlength="2000" placeholder="Availability, licences, anything we should know…"></textarea></label>
+            <button class="btn btn-red btn-block" type="submit">Apply now</button>
+            <p class="hint">Your profile, CV and documents from your account are sent with your application.</p>
+          </form>
+        <% } %>
+        <button type="button" class="btn btn-outline btn-block save-btn" data-save="<%= job.id %>" aria-pressed="false"><%- icon('heart') %> <span>Save job</span></button>
+      </div>
+      <% if (similar.length) { %>
+        <div class="side-card"><h3>Similar jobs</h3><ul class="plain-list"><% similar.forEach(function (s) { %><li><a href="/jobs/<%= s.id %>"><%= s.title %></a><span class="muted small"><%= place(s.location, s.state, s.country) %></span></li><% }) %></ul></div>
+      <% } %>
+    </aside>
+  </div>
+</section>
+<%- include('partials/footer') %>

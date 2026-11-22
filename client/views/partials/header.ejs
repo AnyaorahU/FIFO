@@ -1,0 +1,84 @@
+<%- include('head') %>
+<% var menu = menus[audience] || menus.candidates; %>
+<header class="site-header" data-header>
+  <div class="container header-grid">
+    <%- include('logo') %>
+    <div class="header-top">
+      <div class="audience-switch" role="group" aria-label="Choose audience">
+        <a href="/" class="<%= audience === 'candidates' ? 'on' : '' %>">Candidates</a>
+        <a href="/companies" class="<%= audience === 'companies' ? 'on' : '' %>">Companies</a>
+      </div>
+      <ul class="utility">
+        <% menus.utility.forEach(function (l) { %><li><a href="<%= l.href %>"><%= l.label %></a></li><% }) %>
+        <% if (user) { %>
+          <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin' : 'My account' %></a></li>
+          <li><form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="linklike">Log out</button></form></li>
+        <% } else { %>
+          <li><a href="/login">Log in</a></li>
+        <% } %>
+      </ul>
+    </div>
+    <nav class="main-nav" aria-label="Main">
+      <ul>
+        <% menu.forEach(function (item, i) { var hasMega = item.groups && item.groups.length && !item.href; %>
+          <li class="<%= hasMega ? 'has-mega' : '' %>">
+            <% if (hasMega) { %>
+              <button type="button" class="nav-trigger" aria-expanded="false" data-mega="m<%= i %>"><%= item.label %> <%- icon('chevron') %></button>
+              <div class="mega" id="m<%= i %>">
+                <div class="mega-inner">
+                  <% item.groups.forEach(function (g) { %>
+                    <div class="mega-col">
+                      <% if (g.title) { %><h3><%= g.title %></h3><% } %>
+                      <ul><% g.links.forEach(function (l) { %><li><a href="<%= l.href %>" <%- l.href === '#job-alerts' ? 'data-open-alerts' : '' %>><%= l.label %></a></li><% }) %></ul>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            <% } else { %>
+              <a href="<%= item.href || '#' %>"><%= item.label %></a>
+            <% } %>
+          </li>
+        <% }) %>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <% if (audience === 'companies') { %>
+        <a href="/companies/enquiry" class="btn-outline-light"><%- icon('mail') %> <span>Request staff</span></a>
+      <% } else { %>
+        <a href="/jobs/saved" class="btn-outline-light" data-saved-link><%- icon('heart') %> <span>Saved jobs</span> <b class="saved-count" data-saved-count hidden></b></a>
+      <% } %>
+      <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" data-menu-toggle><%- icon('menu') %></button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" data-mobile-menu hidden>
+    <div class="mobile-menu-head">
+      <%- include('logo') %>
+      <button class="menu-toggle" type="button" aria-label="Close menu" data-menu-close><%- icon('close') %></button>
+    </div>
+    <div class="audience-switch">
+      <a href="/" class="<%= audience === 'candidates' ? 'on' : '' %>">Candidates</a>
+      <a href="/companies" class="<%= audience === 'companies' ? 'on' : '' %>">Companies</a>
+    </div>
+    <% menu.forEach(function (item) { if (item.groups && item.groups.length && !item.href) { %>
+      <details>
+        <summary><%= item.label %> <%- icon('chevron') %></summary>
+        <% item.groups.forEach(function (g) { %>
+          <% if (g.title) { %><h3><%= g.title %></h3><% } %>
+          <ul><% g.links.forEach(function (l) { %><li><a href="<%= l.href %>" <%- l.href === '#job-alerts' ? 'data-open-alerts' : '' %>><%= l.label %></a></li><% }) %></ul>
+        <% }) %>
+      </details>
+    <% } else { %>
+      <a class="mobile-link" href="<%= item.href || '#' %>"><%= item.label %></a>
+    <% } }) %>
+    <ul class="mobile-utility">
+      <% menus.utility.forEach(function (l) { %><li><a href="<%= l.href %>"><%= l.label %></a></li><% }) %>
+      <% if (user) { %>
+        <li><a href="<%= user.role === 'admin' ? '/admin' : '/dashboard' %>"><%= user.role === 'admin' ? 'Admin' : 'My account' %></a></li>
+      <% } else { %>
+        <li><a href="/login">Log in</a></li><li><a href="/register">Create account</a></li>
+      <% } %>
+    </ul>
+  </div>
+</header>
+<main id="main">

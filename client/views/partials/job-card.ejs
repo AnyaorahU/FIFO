@@ -1,0 +1,14 @@
+<article class="job-card" data-sector="<%= job.sector %>">
+  <div class="job-card-top">
+    <div>
+      <p class="job-date">Published on <%= fmtShort(job.published_at) %></p>
+      <h3><a href="/jobs/<%= job.id %>"><%= job.title %></a></h3>
+    </div>
+    <button type="button" class="heart" data-save="<%= job.id %>" aria-pressed="false" aria-label="Save <%= job.title %>"><%- icon('heart') %></button>
+  </div>
+  <p class="job-summary"><%= job.summary %></p>
+  <div class="job-meta">
+    <span><%- icon('pin') %> <%= place(job.location, job.state, job.country) %></span>
+    <span><%- icon('briefcase') %> <%= job.contract_type %></span>
+  </div>
+</article>

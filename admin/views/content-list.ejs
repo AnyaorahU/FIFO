@@ -1,0 +1,26 @@
+<%- include('_top') %>
+<div class="filters card">
+  <a href="/admin/content" class="link-back">← All content</a>
+  <a class="btn btn-primary" href="/admin/content/<%= typeName %>/new" style="margin-left:auto">+ Add</a>
+</div>
+<section class="card flush">
+  <% if (!rows.length) { %><p class="empty pad">Nothing here yet. <a href="/admin/content/<%= typeName %>/new">Add the first one</a>.</p><% } else { %>
+  <div class="table-wrap">
+  <table class="table">
+    <thead><tr><% def.columns.forEach(function (c) { var f = def.fields.find(function (x) { return x.name === c; }); %><th><%= f ? f.label.replace(/\s*\(.*\)$/, '') : c %></th><% }) %><% if (def.fields.some(function (f) { return f.name === 'order'; })) { %><th>Order</th><% } %></tr></thead>
+    <tbody>
+      <% rows.forEach(function (r) { %>
+        <tr>
+          <% def.columns.forEach(function (c, i) { var f = def.fields.find(function (x) { return x.name === c; }) || {}; var v = r[c]; %>
+            <td><% if (i === 0) { %><a href="/admin/content/<%= typeName %>/<%= r.id %>"><strong><%= v || '(untitled)' %></strong></a><% } else if (f.type === 'checkbox') { %><span class="tag <%= v === false ? 'tag-draft' : 'tag-approved' %>"><%= v === false ? 'Hidden' : 'Shown' %></span><% } else if (f.type === 'date') { %><%= fmtDate(v) %><% } else if (f.type === 'select') { %><%= (f.options && f.options[v]) || v || '—' %><% } else { %><%= v || '—' %><% } %></td>
+          <% }) %>
+          <% if (def.fields.some(function (f) { return f.name === 'order'; })) { %><td><%= r.order == null ? '—' : r.order %></td><% } %>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted small pad"><%= rows.length %> item<%= rows.length === 1 ? '' : 's' %></p>
+  <% } %>
+</section>
+<%- include('_bottom') %>

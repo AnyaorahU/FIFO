@@ -1,0 +1,57 @@
+<%- include('_top') %>
+<%
+  var groups = def.single ? def.groups : [{ title: null, fields: def.fields }];
+  var hasImage = groups.some(function (g) { return g.fields.some(function (f) { return f.type === 'image'; }); });
+  var action = def.single ? '/admin/content/' + typeName : (id ? '/admin/content/' + typeName + '/' + id : '/admin/content/' + typeName);
+  var it = typeof item !== 'undefined' ? item : null;
+  var previewHref = it && it.path ? it.path : (it && it.slug && typeName === 'news' ? '/news/' + it.slug : (it && it.slug && typeName === 'sectors' ? '/sectors/' + it.slug : null));
+%>
+<p><a href="/admin/content<%= def.single ? '' : '/' + typeName %>" class="link-back">← <%= def.single ? 'All content' : def.label %></a><% if (previewHref) { %> · <a class="link-back" href="<%= previewHref %>" target="_blank">View on site ↗</a><% } %></p>
+<form method="post" action="<%= action %><%= hasImage ? '?_csrf=' + csrfToken : '' %>" <%- hasImage ? 'enctype="multipart/form-data"' : '' %> class="form content-form">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <% groups.forEach(function (g) { %>
+    <section class="card" <%- g.key ? 'id="' + g.key + '"' : '' %>>
+      <% if (g.title) { %><div class="card-head"><h2><%= g.title %></h2></div><% } %>
+      <% if (g.help) { %><p class="hint group-help"><%= g.help %></p><% } %>
+      <div class="form">
+      <% g.fields.forEach(function (f) { var v = values[f.name]; %>
+        <% if (f.type === 'checkbox') { %>
+          <label class="check"><input type="checkbox" name="<%= f.name %>" value="on" <%= v ? 'checked' : '' %>> <%= f.label %></label>
+        <% } else { %>
+          <label><span><%= f.label %><%= f.required ? ' *' : '' %></span>
+            <% if (['textarea', 'paragraphs', 'list', 'markdown', 'linkgroups'].includes(f.type)) { %>
+              <textarea name="<%= f.name %>" rows="<%= f.type === 'markdown' ? 16 : (f.type === 'paragraphs' || f.type === 'linkgroups' ? 8 : 4) %>" class="<%= f.type === 'markdown' || f.type === 'linkgroups' ? 'mono' : '' %>"><%= v %></textarea>
+            <% } else if (f.type === 'select') { %>
+              <select name="<%= f.name %>"><% Object.keys(f.options).forEach(function (k) { %><option value="<%= k %>" <%= String(v) === k ? 'selected' : '' %>><%= f.options[k] %></option><% }) %></select>
+            <% } else if (f.type === 'number') { %>
+              <input type="number" step="any" name="<%= f.name %>" value="<%= v %>">
+            <% } else if (f.type === 'date') { %>
+              <input type="date" name="<%= f.name %>" value="<%= v %>">
+            <% } else if (f.type === 'image') { %>
+              <div class="image-field">
+                <% if (v) { %><img src="<%= v %>" alt="" class="image-preview"><% } %>
+                <div class="image-inputs">
+                  <input type="text" name="<%= f.name %>" value="<%= v %>" placeholder="/img/... or https://...">
+                  <input type="file" name="<%= f.name %>" accept=".jpg,.jpeg,.png,.webp">
+                  <span class="hint">Upload a new image (JPG, PNG or WebP, max <%= 10 %> MB) or paste an image path.</span>
+                </div>
+              </div>
+            <% } else { %>
+              <input type="text" name="<%= f.name %>" value="<%= v %>">
+            <% } %>
+            <% if (f.help) { %><span class="hint"><%= f.help %></span><% } %>
+          </label>
+        <% } %>
+      <% }) %>
+      </div>
+    </section>
+  <% }) %>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Save</button></div>
+</form>
+<% if (id && !def.single) { %>
+  <form method="post" action="/admin/content/<%= typeName %>/<%= id %>/delete" data-confirm="Delete this item? This cannot be undone.">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+    <button class="btn btn-danger" type="submit"><%- icon('trash') %> Delete</button>
+  </form>
+<% } %>
+<%- include('_bottom') %>

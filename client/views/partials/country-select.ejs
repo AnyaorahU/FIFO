@@ -1,0 +1,5 @@
+<%# Country dropdown. Locals: name, selected, required (bool), placeholder %>
+<select name="<%= name %>" <%= typeof required !== 'undefined' && required ? 'required' : '' %> autocomplete="country-name">
+  <option value=""><%= typeof placeholder !== 'undefined' ? placeholder : 'Select a country…' %></option>
+  <% constants.COUNTRIES.forEach(function (c) { %><option <%= selected === c ? 'selected' : '' %>><%= c %></option><% }) %>
+</select>

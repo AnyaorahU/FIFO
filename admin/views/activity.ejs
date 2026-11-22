@@ -1,0 +1,6 @@
+<%- include('_top') %>
+<section class="card">
+  <p class="muted small">Most recent 300 events: sign-ins, uploads, submissions, status changes and admin downloads.</p>
+  <%- include('_activity', { rows: rows, showUser: true }) %>
+</section>
+<%- include('_bottom') %>

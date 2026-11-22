@@ -1,0 +1,178 @@
+<%- include('partials/header') %>
+<%
+  var statusText = { draft: 'Profile not submitted yet', submitted: 'Submitted, awaiting review', under_review: 'Under review', approved: 'Approved', rejected: 'Not successful' };
+  var appStatus = { new: 'Received', shortlisted: 'Shortlisted', placed: 'Successful', unsuccessful: 'Not progressed' };
+  var kb = function (n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.ceil(n / 1024) + ' KB'; };
+  var locked = app.status === 'submitted' || app.status === 'under_review';
+  var myLicences = app.licences || [];
+%>
+<section class="banner dash-banner">
+  <div class="container banner-inner dash-head">
+    <div>
+      <p class="eyebrow">Candidate portal</p>
+      <h1>Hi, <%= user.name.split(' ')[0] %></h1>
+      <p class="banner-intro">Keep your profile and documents up to date so our consultants can match you quickly.</p>
+    </div>
+    <div class="status-pill status-<%= app.status %>"><span class="dot"></span><%= statusText[app.status] %></div>
+  </div>
+</section>
+<%- include('partials/flash') %>
+
+<div class="container-narrow dash">
+  <ol class="progress">
+    <% steps.forEach(function (s, i) { %>
+      <li class="<%= s.done ? 'done' : '' %>"><span><%- s.done ? icon('check') : (i + 1) %></span><%= s.label %></li>
+    <% }) %>
+  </ol>
+
+  <% if (app.status === 'approved') { %>
+    <div class="notice notice-success"><%- icon('check') %><div><strong>You're approved.</strong> A consultant will contact you about suitable roles in <%= sectorName(app.job_sector) %>. You can also <a href="/jobs">apply for jobs</a> directly.</div></div>
+  <% } else if (app.status === 'rejected') { %>
+    <div class="notice notice-error"><%- icon('file') %><div><strong>Your profile wasn't successful this time.</strong> You can update your documents and resubmit at any time.</div></div>
+  <% } else if (locked) { %>
+    <div class="notice notice-info"><%- icon('clock') %><div><strong>Your profile is with our team.</strong> You can still update your documents; we'll see the latest versions.</div></div>
+  <% } %>
+
+  <div class="dash-grid">
+    <section class="card" id="profile">
+      <div class="card-head"><h2><span class="bar"></span>Profile &amp; work rights</h2></div>
+      <form method="post" action="/dashboard/profile" class="form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <div class="row2">
+          <label>Full name<input name="name" required maxlength="120" value="<%= user.name %>"></label>
+          <label>Email<input value="<%= user.email %>" disabled></label>
+        </div>
+        <div class="row3">
+          <label>Phone<input name="phone" type="tel" maxlength="40" value="<%= user.phone || '' %>" placeholder="+61 4xx xxx xxx"></label>
+          <label>Country you want to work in
+            <%- include('partials/country-select', { name: 'country', selected: app.country }) %>
+          </label>
+          <label>City / preferred region<input name="location" maxlength="120" value="<%= app.location || '' %>" placeholder="e.g. Perth, Pilbara, Dubai"></label>
+        </div>
+        <div class="row2">
+          <label>Job sector
+            <select name="job_sector" required>
+              <option value="">Select a sector…</option>
+              <% sectors.forEach(function (s) { %><option value="<%= s.slug %>" <%= app.job_sector === s.slug ? 'selected' : '' %>><%= s.name %></option><% }) %>
+            </select>
+          </label>
+          <label>Availability
+            <select name="availability"><option value="">Select…</option><% constants.AVAILABILITY.forEach(function (a) { %><option <%= app.availability === a ? 'selected' : '' %>><%= a %></option><% }) %></select>
+          </label>
+        </div>
+        <div class="row2">
+          <label>Right to work
+            <select name="work_rights" data-work-rights><option value="">Select…</option><% Object.keys(constants.WORK_RIGHTS).forEach(function (k) { %><option value="<%= k %>" <%= app.work_rights === k ? 'selected' : '' %>><%= constants.WORK_RIGHTS[k] %></option><% }) %></select>
+          </label>
+          <label data-visa-field>Visa type <span class="hint">(if applicable)</span><input name="visa_type" maxlength="80" value="<%= app.visa_type || '' %>" placeholder="e.g. Working holiday (417)"></label>
+        </div>
+        <fieldset class="checks">
+          <legend>Licences &amp; tickets</legend>
+          <% (site.licences || []).forEach(function (l) { %><label><input type="checkbox" name="licences" value="<%= l %>" <%= myLicences.includes(l) ? 'checked' : '' %>> <%= l %></label><% }) %>
+        </fieldset>
+        <label>About you <span class="hint">(optional)</span><textarea name="summary" rows="3" maxlength="2000" placeholder="Experience, preferred shifts, anything else…"><%= app.summary || '' %></textarea></label>
+        <p class="hint">We are not a registered migration agent and cannot give visa advice.</p>
+        <button class="btn btn-dark" type="submit">Save profile</button>
+      </form>
+    </section>
+
+    <section class="card submit-card">
+      <div class="card-head"><h2><span class="bar"></span>Your profile</h2></div>
+      <ul class="req-list">
+        <li class="<%= app.job_sector ? 'ok' : '' %>"><%- icon(app.job_sector ? 'check' : 'close') %> Job sector <%= app.job_sector ? '· ' + sectorName(app.job_sector) : '' %></li>
+        <li class="<%= app.work_rights ? 'ok' : '' %>"><%- icon(app.work_rights ? 'check' : 'close') %> Right to work</li>
+        <li class="<%= cv ? 'ok' : '' %>"><%- icon(cv ? 'check' : 'close') %> CV uploaded</li>
+        <li class="<%= passport ? 'ok' : '' %>"><%- icon(passport ? 'check' : 'close') %> Passport / ID uploaded</li>
+        <li class="ok opt"><%- icon(certificates.length ? 'check' : 'award') %> Certificates · <%= certificates.length %> (optional)</li>
+      </ul>
+      <% if (app.status === 'draft' || app.status === 'rejected') { %>
+        <form method="post" action="/dashboard/submit">
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <button class="btn btn-red btn-block" type="submit" <%= ready ? '' : 'disabled' %>><%= app.status === 'rejected' ? 'Resubmit profile' : 'Submit profile for review' %></button>
+        </form>
+        <% if (!ready) { %><p class="hint center">Add a sector, CV and passport to submit.</p><% } %>
+      <% } else { %>
+        <p class="muted small">Submitted <%= fmtDate(app.submitted_at) %> · updated <%= fmtDate(app.updated_at) %></p>
+      <% } %>
+      <a class="btn btn-blue btn-block" href="/jobs"><%- icon('search') %> Browse jobs</a>
+    </section>
+  </div>
+
+  <h2 class="section-title" id="applications">My job applications</h2>
+  <section class="card flush">
+    <% if (!jobApps.length) { %>
+      <p class="empty pad">You haven't applied for any jobs yet. <a href="/jobs">Find a job</a></p>
+    <% } else { %>
+      <ul class="app-list">
+        <% jobApps.forEach(function (a) { %>
+          <li>
+            <div><a href="/jobs/<%= a.job_id %>"><strong><%= a.title %></strong></a><span class="muted small"><%= place(a.location, a.state, a.country) %> · <%= a.contract_type %></span></div>
+            <span class="muted small">Applied <%= fmtShort(a.created_at) %></span>
+            <span class="tag tag-app-<%= a.status %>"><%= appStatus[a.status] %></span>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </section>
+
+  <h2 class="section-title" id="documents">Your documents</h2>
+  <div class="doc-grid">
+    <% [['cv', 'CV / Résumé', 'file', cv], ['passport', 'Passport / ID', 'passport', passport]].forEach(function (d) { var kind = d[0], doc = d[3]; %>
+      <section class="card doc-card">
+        <div class="doc-head">
+          <span class="doc-icon"><%- icon(d[2]) %></span>
+          <div><h3><%= d[1] %> <span class="req">Required</span></h3><p class="hint"><%= ALLOWED[kind].join(', ') %> · max <%= MAX_MB %> MB</p></div>
+        </div>
+        <% if (doc) { %>
+          <div class="file-row">
+            <a href="/files/<%= doc.id %>" class="file-name"><%- icon('download') %> <%= doc.original_name %></a>
+            <span class="hint"><%= kb(doc.size) %> · <%= fmtDate(doc.uploaded_at) %></span>
+            <form method="post" action="/dashboard/documents/<%= doc.id %>/delete" data-confirm="Remove this document?">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+              <button class="icon-btn" type="submit" aria-label="Delete"><%- icon('trash') %></button>
+            </form>
+          </div>
+        <% } %>
+        <form method="post" action="/dashboard/upload/<%= kind %>?_csrf=<%= csrfToken %>" enctype="multipart/form-data" class="upload-form">
+          <label class="dropzone">
+            <input type="file" name="file" accept="<%= ALLOWED[kind].join(',') %>" required data-file-input>
+            <%- icon('upload') %>
+            <span data-file-label><%= doc ? 'Replace file' : 'Choose a file or drag it here' %></span>
+          </label>
+          <button class="btn btn-dark" type="submit">Upload</button>
+        </form>
+      </section>
+    <% }) %>
+
+    <section class="card doc-card wide">
+      <div class="doc-head">
+        <span class="doc-icon"><%- icon('award') %></span>
+        <div><h3>Licences &amp; certificates <span class="opt-tag">Optional</span></h3><p class="hint">Forklift licence, White Card, driver licence, first aid, qualifications · up to 5 at a time</p></div>
+      </div>
+      <% if (certificates.length) { %>
+        <div class="file-list">
+          <% certificates.forEach(function (c) { %>
+            <div class="file-row">
+              <a href="/files/<%= c.id %>" class="file-name"><%- icon('download') %> <%= c.title ? c.title + ' · ' : '' %><%= c.original_name %></a>
+              <span class="hint"><%= kb(c.size) %> · <%= fmtDate(c.uploaded_at) %></span>
+              <form method="post" action="/dashboard/documents/<%= c.id %>/delete" data-confirm="Remove this certificate?">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button class="icon-btn" type="submit" aria-label="Delete"><%- icon('trash') %></button>
+              </form>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+      <form method="post" action="/dashboard/upload/certificate?_csrf=<%= csrfToken %>" enctype="multipart/form-data" class="upload-form cert">
+        <input name="title" maxlength="120" placeholder="Certificate name (optional), e.g. Forklift licence">
+        <label class="dropzone">
+          <input type="file" name="files" multiple accept="<%= ALLOWED.certificate.join(',') %>" required data-file-input>
+          <%- icon('upload') %>
+          <span data-file-label>Choose files</span>
+        </label>
+        <button class="btn btn-dark" type="submit">Upload</button>
+      </form>
+    </section>
+  </div>
+</div>
+<%- include('partials/footer') %>

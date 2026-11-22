@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Secrets & local config
+.env
+.env.*
+!.env.example
+
+# Local data from the old SQLite version (no longer used)
+storage/
+
+# Logs, coverage, OS and editor files
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
