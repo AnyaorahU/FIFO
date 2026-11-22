@@ -33,7 +33,7 @@
                 <div class="image-inputs">
                   <input type="text" name="<%= f.name %>" value="<%= v %>" placeholder="/img/... or https://...">
                   <input type="file" name="<%= f.name %>" accept=".jpg,.jpeg,.png,.webp">
-                  <span class="hint">Upload a new image (JPG, PNG or WebP, max <%= 10 %> MB) or paste an image path.</span>
+                  <span class="hint">Upload a new image (JPG, PNG or WebP, max <%= maxUploadMb %> MB) or paste an image path.</span>
                 </div>
               </div>
             <% } else { %>

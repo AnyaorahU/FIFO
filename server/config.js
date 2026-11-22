@@ -42,7 +42,7 @@ module.exports = {
     // Optional comma-separated list of IPs allowed to open /admin (everyone else gets a 404).
     ipAllowlist: String(process.env.ADMIN_IP_ALLOWLIST || '').split(',').map(s => s.trim()).filter(Boolean),
   },
-  maxUploadMb: Number(process.env.MAX_UPLOAD_MB || 10),
+  maxUploadMb: Math.min(Number(process.env.MAX_UPLOAD_MB || 10), process.env.VERCEL ? 4 : Infinity),
   login: {
     maxFailures: Number(process.env.LOGIN_MAX_FAILURES || 5),
     lockMinutes: Number(process.env.LOGIN_LOCK_MINUTES || 15),

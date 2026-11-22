@@ -150,6 +150,25 @@ documents, admin access denied to candidates, operator injection, account lockou
 password re-confirmation for dangerous admin actions, admin idle timeout and database validation. GitHub Actions
 runs them on every push (`.github/workflows/ci.yml`).
 
+## Deploying to Vercel
+
+The repo is Vercel-ready: `api/index.js` is the serverless entry point, `vercel.json` sends every page request to it
+and serves `client/public` (CSS, JS, images) from Vercel's CDN. Source files are never exposed.
+
+1. Push the repo to GitHub and import it in Vercel (Framework preset: **Other**; leave build settings empty,
+   `vercel.json` sets them).
+2. In Vercel → Project → Settings → Environment Variables add at least: `MONGODB_URI`, `MONGODB_DB`,
+   `SESSION_SECRET` (32+ random characters), `NODE_ENV=production`. Optional: `ADMIN_IP_ALLOWLIST`,
+   `ADMIN_IDLE_MINUTES`, `MAP_TILE_URL`.
+3. In Atlas → Network Access, allow Vercel to connect. Vercel functions don't have fixed IPs, so this usually means
+   `0.0.0.0/0`; keep the database password long and the database user limited to `readWrite` on this database.
+4. Seed the database once from your computer (`npm run seed` with the same `MONGODB_URI` in `.env`), and run
+   `npm run migrate` after upgrades.
+5. Deploy. The site is served at `https://<project-name>.vercel.app`; add your own domain under Settings → Domains.
+
+Notes: Vercel limits request bodies to 4.5 MB, so uploads are capped at 4 MB there. Login rate limits are kept
+per function instance; the per-account lockout is stored in MongoDB and always applies.
+
 ## Deployment checklist
 
 - `NODE_ENV=production` behind HTTPS (`trust proxy` is set automatically in production).

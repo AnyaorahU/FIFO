@@ -79,6 +79,7 @@ function buildApp() {
       res.locals.constants = constants;
       res.locals.path = req.path;
       res.locals.mapTiles = config.mapTiles;
+      res.locals.maxUploadMb = config.maxUploadMb;
       res.locals.audience = req.path.startsWith('/companies') ? 'companies' : 'candidates';
       res.locals.place = (...parts) => parts.filter(Boolean).join(', ');
       res.locals.sectorName = slug => (c.sectors.find(s => s.slug === slug) || {}).name || slug || '—';
@@ -130,4 +131,13 @@ if (require.main === module) {
   });
 }
 
-module.exports = { buildApp, start, SESSION_COOKIE };
+// Serverless hosts (Vercel): connect once per instance and reuse the app across requests.
+let appPromise = null;
+function getApp() {
+  if (!appPromise) {
+    appPromise = dbm.connect().then(buildApp).catch(err => { appPromise = null; throw err; });
+  }
+  return appPromise;
+}
+
+module.exports = { buildApp, start, getApp, SESSION_COOKIE };
