@@ -8,6 +8,8 @@ const isProd = process.env.NODE_ENV === 'production';
 
 function fail(msg) {
   console.error(`[config] ${msg}`);
+  // On serverless hosts throw instead of exiting, so the error shows clearly in the function logs.
+  if (process.env.VERCEL) throw new Error(`Configuration error: ${msg}`);
   process.exit(1);
 }
 
